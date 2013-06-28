@@ -295,7 +295,7 @@ CSVMapField::CSVMapField(const QDomElement & elem)
     else if(elemThis.tagName() == "isKey")
       setIsKey(TRUE);
     else if(elemThis.tagName() == "Type")
-      setType(QVariant::nameToType(elemThis.text().toAscii().data()));
+      setType(QVariant::nameToType(elemThis.text().toLatin1().data()));
     else if(elemThis.tagName() == "Action")
       action = nameToAction(elemThis.text());
     else if(elemThis.tagName() == "Column")

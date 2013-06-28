@@ -10,6 +10,7 @@
 
 TEMPLATE = app
 CONFIG += qt warn_on release
+QT     += widgets
 
 include(../global.pri)
 

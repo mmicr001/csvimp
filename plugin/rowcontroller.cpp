@@ -19,7 +19,7 @@ RowController::RowController(QTableWidget *table, int row, QObject *parent, cons
   : QObject(parent)
 {
   setObjectName(name ?
-                name : QString("_rowController%1").arg(row).toAscii().data());
+                name : QString("_rowController%1").arg(row).toLatin1().data());
   _row = row;
   _action = 0;
   _column = 0;

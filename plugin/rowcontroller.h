@@ -11,6 +11,9 @@
 #ifndef __ROWCONTROLLER_H__
 #define __ROWCONTROLLER_H__
 
+#define TRUE 1
+#define FALSE 0
+
 #include <QObject>
 
 class QComboBox;

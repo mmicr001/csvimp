@@ -1,0 +1,25 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+.DS_Store
+Makefile
+application/Makefile
+application/qrc_csvimp.cpp
+application/tmp/
+csvimp.app/
+plugin/Makefile
+plugin/csvimpplugin.json
+plugin/qrc_csvimp.cpp
+plugin/tmp/
+plugins/

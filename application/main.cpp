@@ -16,7 +16,7 @@
 #include <QSplashScreen>
 #include <QSqlDatabase>
 #include <QStyleFactory>
-#include <QWindowsStyle>
+#include <QProxyStyle>
 
 #ifdef Q_WS_MACX
 #include <qmacstyle_mac.h>
@@ -30,6 +30,9 @@
 
 #include "csvimpdata.h"
 #include "csvimpplugininterface.h"
+
+#define TRUE 1
+#define FALSE 0
 
 CSVImpPluginInterface *csvimpInterface = 0;
 
@@ -77,11 +80,11 @@ int main(int argc, char *argv[])
   if (QSysInfo::WindowsVersion == QSysInfo::WV_XP)
     app.setStyle(QStyleFactory::create("windowsxpstyle"));
   else
-    app.setStyle(new QWindowsStyle);
+    app.setStyle(new QProxyStyle);
 #elif defined Q_WS_MACX
   app.setStyle(new QMacStyle);
 #else
-  app.setStyle(new QWindowsStyle);
+  app.setStyle(new QProxyStyle);
 #endif
 
   if (!loadPlugin())

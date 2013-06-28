@@ -19,6 +19,9 @@
 #include <QStringList>
 #include <QVariant>
 
+#define TRUE 1
+#define FALSE 0
+
 class CSVMapField
 {
   public:

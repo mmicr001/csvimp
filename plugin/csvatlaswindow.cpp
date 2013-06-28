@@ -333,7 +333,7 @@ void CSVAtlasWindow::sMapChanged( int )
       else
         field.setIsKey(FALSE);
 
-      field.setType(QVariant::nameToType(_fields->item(r, 2)->data(Qt::EditRole).toString().toAscii().data()));
+      field.setType(QVariant::nameToType(_fields->item(r, 2)->data(Qt::EditRole).toString().toLatin1().data()));
 
       if (qobject_cast<QComboBox*>(_fields->cellWidget(r, 4)))
         field.setAction(CSVMapField::nameToAction(qobject_cast<QComboBox*>(_fields->cellWidget(r, 4))->currentText()));

@@ -12,6 +12,7 @@ TEMPLATE        = lib
 CONFIG         += plugin qt warn_on release
 TARGET          = $$qtLibraryTarget(csvimpplugin)
 DESTDIR         = ../plugins
+QT             += widgets printsupport
 
 # TODO: why is shared not implied by plugin on mac win32-x-g++?
 win32-g++-4.6 {

@@ -29,6 +29,8 @@ CSVImpPlugin::CSVImpPlugin(QObject *parent)
   _csvdir        = QString::null;
   _csvtoolwindow = 0;
   _msghandler    = 0;
+  
+  Q_PLUGIN_METADATA(IID "csvimpplugin" FILE "csvimpplugin.json");
 }
 
 QMainWindow *CSVImpPlugin::getCSVAtlasWindow(QWidget *parent, Qt::WindowFlags flags)
@@ -209,5 +211,3 @@ void CSVImpPlugin::cleanupDestroyedObject(QObject *object)
   else if (object == _msghandler)
     _msghandler = 0;
 }
-
-Q_EXPORT_PLUGIN2(csvimpplugin, CSVImpPlugin);
