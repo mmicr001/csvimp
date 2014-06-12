@@ -20,22 +20,34 @@ MOC_DIR     = tmp
 UI_DIR      = tmp
 
 INCLUDEPATH += ../csvimpcommon ../csvimpcommon/images ../plugin \
-               ../$${OPENRPT_DIR}/common ../$${OPENRPT_DIR}/MetaSQL \
-               ../$${OPENRPT_BLD}/common ../$${OPENRPT_BLD}/MetaSQL
+               $${OPENRPT_DIR}/common $${OPENRPT_DIR}/MetaSQL \
+               $${OPENRPT_BLD}/common $${OPENRPT_BLD}/MetaSQL
 INCLUDEPATH = $$unique(INCLUDEPATH)
 
 win32:INCLUDEPATH += .
 DEPENDPATH  += $${INCLUDEPATH}
 
-LIBS += -L../$${OPENRPT_BLD}/lib -lcommon -lMetaSQL
+openrpt_shared {
+  QMAKE_LIBDIR = $${OPENRPT_BLD} $$QMAKE_LIBDIR
+  LIBS += -lopenrptcommon
+} else {
+  QMAKE_LIBDIR = $${OPENRPT_BLD}/lib $$QMAKE_LIBDIR
+  LIBS += -lcommon
+}
+LIBS += -lMetaSQL
 
 win32-msvc* {
-  PRE_TARGETDEPS += ../$${OPENRPT_BLD}/lib/common.lib      \
-                    ../$${OPENRPT_BLD}/lib/MetaSQL.lib     \
+  PRE_TARGETDEPS += $${OPENRPT_BLD}/lib/common.lib      \
+                    $${OPENRPT_BLD}/lib/MetaSQL.lib     \
 
 } else {
-  PRE_TARGETDEPS += ../$${OPENRPT_BLD}/lib/libcommon.a      \
-                    ../$${OPENRPT_BLD}/lib/libMetaSQL.a     \
+  openrpt_shared {
+    PRE_TARGETDEPS += $${OPENRPT_BLD}/libopenrptcommon.so      \
+                      $${OPENRPT_BLD}/libMetaSQL.so
+  } else {
+    PRE_TARGETDEPS += $${OPENRPT_BLD}/lib/libcommon.a      \
+                      $${OPENRPT_BLD}/lib/libMetaSQL.a     \
+  }
 }
 win32:RC_FILE = application.rc
 
