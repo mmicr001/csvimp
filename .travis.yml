@@ -1,7 +1,7 @@
 language: cpp
 compiler:
   - gcc
-  - clang
+# - clang
 
 #env:
 # matrix:
@@ -13,6 +13,7 @@ before_install:
   - sudo apt-get install -y  libqt4-dev
 
 install:
+  - cd ..
   - git clone http://github.com/xtuple/openrpt.git
   - cd openrpt
   - qmake && make
