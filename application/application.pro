@@ -11,6 +11,13 @@
 TEMPLATE = app
 CONFIG += qt warn_on release
 
+HARDCODE_APPLICATION_DIR = $$(HARDCODE_APPLICATION_DIR)
+! isEmpty( HARDCODE_APPLICATION_DIR ) {
+  # Note the way we wrap the variable with '"  "' to ensure it is
+  # properly quoted for C/C++ syntax
+  QMAKE_CXXFLAGS += -DHARDCODE_APPLICATION_DIR=\'\"$(HARDCODE_APPLICATION_DIR)\"\'
+}
+
 include(../global.pri)
 
 TARGET = ../csvimp

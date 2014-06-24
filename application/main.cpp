@@ -35,7 +35,11 @@ CSVImpPluginInterface *csvimpInterface = 0;
 
 bool loadPlugin()
 {
+#ifdef HARDCODE_APPLICATION_DIR
+  QDir pluginsDir(HARDCODE_APPLICATION_DIR);
+#else
   QDir pluginsDir(QApplication::applicationDirPath());
+#endif
 
   while (! pluginsDir.exists("plugins") && pluginsDir.cdUp())
     ;
