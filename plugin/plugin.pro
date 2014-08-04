@@ -33,27 +33,26 @@ INCLUDEPATH += ../csvimpcommon ../csvimpcommon/images \
                $${OPENRPT_DIR}/common $${OPENRPT_DIR}/MetaSQL
 win32:INCLUDEPATH += .
 DEPENDPATH  += $${INCLUDEPATH}
+
+QMAKE_LIBDIR = $${OPENRPT_LIBDIR} $$QMAKE_LIBDIR
+LIBS += -lopenrptcommon
 openrpt_shared {
-  QMAKE_LIBDIR = $${OPENRPT_BLD} $$QMAKE_LIBDIR
-  LIBS += -lopenrptcommon
+  LIBEXT = $${QMAKE_EXTENSION_SHLIB}
 } else {
-  QMAKE_LIBDIR = $${OPENRPT_BLD}/lib $$QMAKE_LIBDIR
-  LIBS += -lcommon
+  win32-msvc* {
+    LIBEXT = lib
+  } else {
+    LIBEXT = a
+  }
 }
 LIBS += -lMetaSQL
 
 win32-msvc* {
-  PRE_TARGETDEPS += $${OPENRPT_BLD}/lib/common.lib   \
-                    $${OPENRPT_BLD}/lib/MetaSQL.lib  \
-
+  PRE_TARGETDEPS += $${OPENRPT_LIBDIR}/openrptcommon.$${LIBEXT} \
+                    $${OPENRPT_LIBDIR}/MetaSQL.$${LIBEXT}
 } else {
-  openrpt_shared {
-    PRE_TARGETDEPS += $${OPENRPT_BLD}/libopenrptcommon.so      \
-                      $${OPENRPT_BLD}/libMetaSQL.so
-  } else {
-    PRE_TARGETDEPS += $${OPENRPT_BLD}/lib/libcommon.a  \
-                      $${OPENRPT_BLD}/lib/libMetaSQL.a \
-  }
+  PRE_TARGETDEPS += $${OPENRPT_LIBDIR}/libopenrptcommon.$${LIBEXT} \
+                    $${OPENRPT_LIBDIR}/libMetaSQL.$${LIBEXT}
 }
 
 FORMS    = csvaddmapinputdialog.ui \
