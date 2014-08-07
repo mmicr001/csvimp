@@ -40,6 +40,9 @@ isEmpty( OPENRPT_LIBDIR ) {
                                   OPENRPT_BLD    = ../$${OPENRPT_BLD}    }
 ! isEmpty( OPENRPT_LIBDIR_REL ) { OPENRPT_LIBDIR = ../$${OPENRPT_LIBDIR} }
 
+LIBEXT = $${QMAKE_EXTENSION_SHLIB}
+isEmpty( LIBEXT ) { LIBEXT = so }
+
 macx:exists(macx.pri) {
   include(macx.pri)
 }
