@@ -35,17 +35,8 @@ win32:INCLUDEPATH += .
 DEPENDPATH  += $${INCLUDEPATH}
 
 QMAKE_LIBDIR = $${OPENRPT_LIBDIR} $$QMAKE_LIBDIR
-LIBS += -lopenrptcommon
-openrpt_shared {
-  LIBEXT = $${QMAKE_EXTENSION_SHLIB}
-} else {
-  win32-msvc* {
-    LIBEXT = lib
-  } else {
-    LIBEXT = a
-  }
-}
-LIBS += -lMetaSQL
+LIBS += -lopenrptcommon -lMetaSQL
+LIBEXT = $${QMAKE_EXTENSION_SHLIB}
 
 win32-msvc* {
   PRE_TARGETDEPS += $${OPENRPT_LIBDIR}/openrptcommon.$${LIBEXT} \

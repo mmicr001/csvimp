@@ -40,12 +40,6 @@ isEmpty( OPENRPT_LIBDIR ) {
                                   OPENRPT_BLD    = ../$${OPENRPT_BLD}    }
 ! isEmpty( OPENRPT_LIBDIR_REL ) { OPENRPT_LIBDIR = ../$${OPENRPT_LIBDIR} }
 
-# Use a shared library version of openrpt library dependency
-USE_SHARED_OPENRPT = $$(USE_SHARED_OPENRPT)
-! isEmpty( USE_SHARED_OPENRPT ) {
-  CONFIG += openrpt_shared
-}
-
 macx:exists(macx.pri) {
   include(macx.pri)
 }
