@@ -34,28 +34,17 @@ INCLUDEPATH = $$unique(INCLUDEPATH)
 win32:INCLUDEPATH += .
 DEPENDPATH  += $${INCLUDEPATH}
 
-openrpt_shared {
-  QMAKE_LIBDIR = $${OPENRPT_BLD} $$QMAKE_LIBDIR
-  LIBS += -lopenrptcommon
-} else {
-  QMAKE_LIBDIR = $${OPENRPT_BLD}/lib $$QMAKE_LIBDIR
-  LIBS += -lcommon
-}
-LIBS += -lMetaSQL
+QMAKE_LIBDIR = $${OPENRPT_LIBDIR} $$QMAKE_LIBDIR
+LIBS += -lopenrptcommon -lMetaSQL
 
 win32-msvc* {
-  PRE_TARGETDEPS += $${OPENRPT_BLD}/lib/common.lib      \
-                    $${OPENRPT_BLD}/lib/MetaSQL.lib     \
-
+  PRE_TARGETDEPS += $${OPENRPT_LIBDIR}/openrptcommon.$${LIBEXT} \
+                    $${OPENRPT_LIBDIR}/MetaSQL.$${LIBEXT}
 } else {
-  openrpt_shared {
-    PRE_TARGETDEPS += $${OPENRPT_BLD}/libopenrptcommon.so      \
-                      $${OPENRPT_BLD}/libMetaSQL.so
-  } else {
-    PRE_TARGETDEPS += $${OPENRPT_BLD}/lib/libcommon.a      \
-                      $${OPENRPT_BLD}/lib/libMetaSQL.a     \
-  }
+  PRE_TARGETDEPS += $${OPENRPT_LIBDIR}/libopenrptcommon.$${LIBEXT} \
+                    $${OPENRPT_LIBDIR}/libMetaSQL.$${LIBEXT}
 }
+
 win32:RC_FILE = application.rc
 
 macx {

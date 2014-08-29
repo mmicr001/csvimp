@@ -12,33 +12,36 @@ OPENRPT_HEADERS = $$(OPENRPT_HEADERS)
 ! isEmpty( OPENRPT_HEADERS ) {
   OPENRPT_DIR = $$OPENRPT_HEADERS
 } else {
-  exists(../../../../openrpt) {
-    OPENRPT_DIR = ../../../../openrpt
-  }
-  exists(../../../openrpt) {
-    OPENRPT_DIR = ../../../openrpt
-  }
-  exists(../../openrpt) {
-    OPENRPT_DIR = ../../openrpt
-  }
-  exists(../openrpt) {
-    OPENRPT_DIR = ../openrpt
-  }
+  exists(../../openrpt) { OPENRPT_DIR = ../../openrpt }
+  exists(../openrpt)    { OPENRPT_DIR = ../openrpt    }
+  OPENRPT_DIR_REL=true
 }
-  
+
+OPENRPT_BLD = $${OPENRPT_DIR}
+exists($${OPENRPT_DIR}-build-desktop) {
+  OPENRPT_BLD = $${OPENRPT_DIR}-build-desktop
+}
+
+OPENRPT_LIBDIR = $$(OPENRPT_LIBDIR)
+isEmpty( OPENRPT_LIBDIR ) {
+  OPENRPT_LIBDIR = $${OPENRPT_BLD}/lib
+  OPENRPT_LIBDIR_REL=true
+}
+
 ! exists($${OPENRPT_DIR}) {
   error("Could not set the OPENRPT_DIR qmake variable.")
 }
 
-OPENRPT_LIBDIR = $$(OPENRPT_LIBDIR)
-! isEmpty( OPENRPT_LIBDIR ) {
-  OPENRPT_BLD = $$OPENRPT_LIBDIR
-} else {
-  OPENRPT_BLD=$${OPENRPT_DIR}
-  exists($${OPENRPT_DIR}-build-desktop) {
-    OPENRPT_BLD=$${OPENRPT_DIR}-build-desktop
-  }
+! exists($${OPENRPT_LIBDIR}) {
+  error("Could not set the OPENRPT_LIBDIR qmake variable.")
 }
+
+! isEmpty( OPENRPT_DIR_REL    ) { OPENRPT_DIR    = ../$${OPENRPT_DIR}
+                                  OPENRPT_BLD    = ../$${OPENRPT_BLD}    }
+! isEmpty( OPENRPT_LIBDIR_REL ) { OPENRPT_LIBDIR = ../$${OPENRPT_LIBDIR} }
+
+LIBEXT = $${QMAKE_EXTENSION_SHLIB}
+isEmpty( LIBEXT ) { LIBEXT = so }
 
 macx:exists(macx.pri) {
   include(macx.pri)
@@ -50,19 +53,5 @@ win32:exists(win32.pri) {
 
 unix:exists(unix.pri) {
   include(unix.pri)
-}
-
-isEmpty( OPENRPT_HEADERS ) {
-  OPENRPT_DIR = ../$$OPENRPT_DIR
-}
-
-isEmpty( OPENRPT_LIBDIR ) {
-  OPENRPT_BLD = ../$$OPENRPT_BLD
-}
-
-# Use a shared library version of openrpt library dependency
-USE_SHARED_OPENRPT = $$(USE_SHARED_OPENRPT)
-! isEmpty( USE_SHARED_OPENRPT ) {
-  CONFIG += openrpt_shared
 }
 

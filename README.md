@@ -8,14 +8,19 @@ CSVimp source code:
 
 * Qt must be installed and working properly to successfully compile
   CSVimp.
+* CSVimp uses OpenRPT's "common" library. Therefore you need either
+  the OpenRPT source code or OpenRPT development packages installed
+  on your Linux box.
 
-* CSVimp must link with OpenRPT's "common" library. Therefore the
-  code for openrpt must be checked out to build CSVImp. It should be
-  stored in the same parent directory and should be compiled side-by-side.
+To build with OpenRPT sources, place the `openrpt` and `csvimp`
+directories in the same parent directory and compile in `openrpt`
+first. You can fork or directly clone from https://github.com/xtuple/openrpt .
+You might also need to set `BUILD_SHARED_LIBS=true` in your environment before
+building in `openrpt`.
 
-The following describes the preferred method for compiling CSVimp:
-
-1. Clone openrpt from GitHub
-2. Clone csvimp from GitHub (save in same parent directory as used for xtuple module)
-3. Compile openrpt
-4. Compile csvimp
+To build with installed OpenRPT packages, set the following
+environment variables:
+- `OPENRPT_HEADERS` names the directory where the OpenRPT header files are
+  installed
+- `OPENRPT_LIBDIR` names the directory where the OpenRPT libraries are
+  installed

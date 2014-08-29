@@ -3,7 +3,8 @@ compiler:
   - gcc
 # - clang
 
-#env:
+env:
+  - BUILD_SHARED_LIBS=true      # for openrpt build
 # matrix:
 #   - QTVER=4
 #   - QTVER=5
