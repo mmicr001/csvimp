@@ -41,6 +41,7 @@ isEmpty( OPENRPT_LIBDIR ) {
 ! isEmpty( OPENRPT_LIBDIR_REL ) { OPENRPT_LIBDIR = ../$${OPENRPT_LIBDIR} }
 
 LIBEXT = $${QMAKE_EXTENSION_SHLIB}
+win32-g++:LIBEXT = a
 isEmpty( LIBEXT ) { LIBEXT = so }
 
 macx:exists(macx.pri) {
