@@ -21,7 +21,7 @@ win32-x-g++ {
   CONFIG += shared
 }
 
-QT += sql xml xmlpatterns
+QT += sql xml xmlpatterns widgets printsupport
 
 include(../global.pri)
 

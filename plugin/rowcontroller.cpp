@@ -19,7 +19,7 @@ RowController::RowController(QTableWidget *table, int row, QObject *parent, cons
   : QObject(parent)
 {
   setObjectName(name ?
-                name : QString("_rowController%1").arg(row).toAscii().data());
+                name : QString("_rowController%1").arg(row).toLatin1().data());
   _row = row;
   _action = 0;
   _column = 0;
@@ -87,34 +87,34 @@ void RowController::finishSetup()
   QString str = _action->currentText();
   if(str == "Default" || str == "UseEmptyString" || str == "UseNull")
   {
-    _column->setEnabled(FALSE);
-    _ifNull->setEnabled(FALSE);
-    _altColumn->setEnabled(FALSE);
-    _altIfNull->setEnabled(FALSE);
+    _column->setEnabled(false);
+    _ifNull->setEnabled(false);
+    _altColumn->setEnabled(false);
+    _altIfNull->setEnabled(false);
     _altValue->setFlags(_altValue->flags() & (~ Qt::ItemIsEditable));
   }
   else if(str == "UseColumn")
   {
-    _column->setEnabled(TRUE);
-    _ifNull->setEnabled(TRUE);
+    _column->setEnabled(true);
+    _ifNull->setEnabled(true);
 
     str = _ifNull->currentText();
     if(str == "Nothing" || str == "UseDefault" || str == "UseEmptyString")
     {
-      _altColumn->setEnabled(FALSE);
-      _altIfNull->setEnabled(FALSE);
+      _altColumn->setEnabled(false);
+      _altIfNull->setEnabled(false);
       _altValue->setFlags(_altValue->flags() & (~ Qt::ItemIsEditable));
     }
     else if(str == "UseAlternateValue")
     {
-      _altColumn->setEnabled(FALSE);
-      _altIfNull->setEnabled(FALSE);
+      _altColumn->setEnabled(false);
+      _altIfNull->setEnabled(false);
       _altValue->setFlags(_altValue->flags() | Qt::ItemIsEditable);
     }
     else if(str == "UseAlternateColumn")
     {
-      _altColumn->setEnabled(TRUE);
-      _altIfNull->setEnabled(TRUE);
+      _altColumn->setEnabled(true);
+      _altIfNull->setEnabled(true);
 
       str = _altIfNull->currentText();
       if(str == "UseAlternateValue")
@@ -125,10 +125,10 @@ void RowController::finishSetup()
   }
   else if(str == "UseAlternateValue")
   {
-    _column->setEnabled(FALSE);
-    _ifNull->setEnabled(FALSE);
-    _altColumn->setEnabled(FALSE);
-    _altIfNull->setEnabled(FALSE);
+    _column->setEnabled(false);
+    _ifNull->setEnabled(false);
+    _altColumn->setEnabled(false);
+    _altIfNull->setEnabled(false);
     _altValue->setFlags(_altValue->flags() | Qt::ItemIsEditable);
   }
 }

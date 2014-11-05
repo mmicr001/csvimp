@@ -209,5 +209,3 @@ void CSVImpPlugin::cleanupDestroyedObject(QObject *object)
   else if (object == _msghandler)
     _msghandler = 0;
 }
-
-Q_EXPORT_PLUGIN2(csvimpplugin, CSVImpPlugin);

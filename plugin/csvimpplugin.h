@@ -20,6 +20,7 @@ class CSVImpPlugin : public QObject, public CSVImpPluginInterface
 {
   Q_OBJECT
   Q_INTERFACES(CSVImpPluginInterface)
+  Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface")
 
   public:
     CSVImpPlugin(QObject *parent = 0);
