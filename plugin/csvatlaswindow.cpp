@@ -491,7 +491,7 @@ void CSVAtlasWindow::sMapChanged( int )
         _fields->setCellWidget(row, 7, altspinner);
 
         QComboBox *altnullcombo = new QComboBox(_fields);
-        altnullcombo->addItems(CSVMapField::ifNullList());
+        altnullcombo->addItems(CSVMapField::ifNullList(true));
         if (! mf.isEmpty())
           altnullcombo->setCurrentIndex(mf.ifNullActionAlt());
         _fields->setCellWidget(row, 8, altnullcombo);
