@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+
+#DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+export HARDCODE_APPLICATION_DIR='"/usr/lib/csvimp"'
+export USE_SHARED_OPENRPT=1
+export OPENRPT_HEADERS=/usr/include/openrpt
+export OPENRPT_LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
+
+%:
+	dh $@ --builddirectory=. --parallel
+
+override_dh_auto_clean:
+	-rm -rf bin/*
+	-dh_auto_clean
+
+#override_dh_auto_configure:
+	#lrelease */*/*.ts */*.ts
+#	qmake
+	# convert to use shared libs
+	#find . -name '*.pro' -exec sed -i -e 's/lib\([A-Za-z]*\)\.a/lib\1.so/'  {} \;
+#	dh_auto_configure
+
+override_dh_auto_install:
+	#mv bin/graph bin/openrpt-graph
+	#mkdir -p debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/csvimp
+	#mv plugins/libcsvimpplugin.so debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/csvimp
+	dh_auto_install
+
+.PHONY: override_dh_auto_install override_dh_auto_clean

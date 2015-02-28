@@ -1,0 +1,30 @@
+Source: csvimp
+Section: misc
+Priority: optional
+Maintainer: Debian xTuple Maintainers <pkg-xtuple-maintainers@lists.alioth.debian.org>
+Uploaders:
+ Andrew Shadura <andrewsh@debian.org>,
+ Daniel Pocock <daniel@pocock.pro>
+Build-Depends: debhelper (>= 9), dpkg-dev (>= 1.16.1~), libqt4-dev (>= 4.1.0), libopenrpt-dev (>= 3.3.7)
+Standards-Version: 3.9.6
+Homepage: http://www.xtuple.org/DataImportTool
+Vcs-Git: https://github.com/xtuple/csvimp
+Vcs-Browser: https://github.com/xtuple/csvimp
+
+Package: csvimp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt4-sql-psql
+Description: CSV data import tool for xTuple applications
+ A tool designed to import Comma Separated Value (CSV) files into the
+ database for the xTuple Applications (PostBooks and OpenMFG).
+
+Package: libcsvimp-dev
+Section: libdevel
+Architecture: any
+Depends: libqt4-dev (>= 4.1.0), ${misc:Depends}
+Description: CSV data import tool for xTuple applications (development files)
+ A tool designed to import Comma Separated Value (CSV) files into the
+ database for the xTuple Applications (PostBooks and OpenMFG).
+ .
+ This package contains the static development library and its headers.
+
