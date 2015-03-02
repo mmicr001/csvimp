@@ -1,0 +1,4 @@
+lib/*
+Makefile .DS_Store
+*/Makefile */.DS_Store */tmp/* */*.qm
+*/*/Makefile */*/.DS_Store */*/tmp/* */*/*.qm
