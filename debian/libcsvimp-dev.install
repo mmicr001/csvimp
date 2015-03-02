@@ -1,0 +1,3 @@
+csvimpcommon/*.h /usr/include/csvimp/csvimpcommon
+plugin/*.h /usr/include/csvimp/plugin
+

@@ -1,0 +1,2 @@
+csvimp /usr/bin
+plugins/libcsvimpplugin.so /usr/lib/csvimp/plugins

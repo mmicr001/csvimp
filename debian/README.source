@@ -1,0 +1,14 @@
+The following was used to repack the tarball from upstream:
+
+   rm plugins/libcsvimpplugin.dylib \
+      csvimp.app/Contents/MacOS/csvimp
+
+   find . -name '*.o' -exec rm {} \;
+
+The following was used to reformat the upstream license text
+(published on their web site at http://www.xtuple.com/CPAL):
+
+   cat cpal-raw.txt | \
+     sed -e 's/^ $/./g' | \
+     sed -e 's/^$/./g' | \
+     while read ; do echo " $REPLY" ; done >> copyright
