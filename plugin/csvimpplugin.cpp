@@ -9,6 +9,7 @@
  */
 
 #include <QtGui>
+#include <QtGlobal>
 
 #include "csvimpplugin.h"
 
@@ -209,3 +210,6 @@ void CSVImpPlugin::cleanupDestroyedObject(QObject *object)
   else if (object == _msghandler)
     _msghandler = 0;
 }
+#if QT_VERSION < 0x050000
+Q_EXPORT_PLUGIN2(csvimpplugin, CSVImpPlugin);
+#endif
