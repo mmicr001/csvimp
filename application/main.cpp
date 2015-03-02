@@ -17,9 +17,12 @@
 #include <QSqlDatabase>
 #include <QStyleFactory>
 #include <QProxyStyle>
+#include <QtGlobal>
 
-#ifdef Q_WS_MACX
+#if QT_VERSION < 0x050000
+#ifdef Q_OS_MACX
 #include <qmacstyle_mac.h>
+#endif
 #endif
 
 #include <xsqlquery.h>
@@ -73,16 +76,16 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
   app.addLibraryPath(".");
 
-#ifndef Q_WS_MACX
+#ifndef Q_OS_MACX
   QApplication::setWindowIcon(QIcon(":/images/CSVimpIcon-32x32.png"));
 #endif
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
   if (QSysInfo::WindowsVersion == QSysInfo::WV_XP)
     app.setStyle(QStyleFactory::create("windowsxpstyle"));
   else
     app.setStyle(new QProxyStyle);
-#elif defined Q_WS_MACX
+#elif defined Q_OS_MACX && QT_VERSION < 0x050000
   app.setStyle(new QMacStyle);
 #else
   app.setStyle(new QProxyStyle);
