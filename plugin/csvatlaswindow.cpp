@@ -331,9 +331,9 @@ void CSVAtlasWindow::sMapChanged( int )
       if (qobject_cast<QCheckBox*>(_fields->cellWidget(r, 0)))
         field.setIsKey(qobject_cast<QCheckBox*>(_fields->cellWidget(r,0))->isChecked());
       else
-        field.setIsKey(FALSE);
+        field.setIsKey(false);
 
-      field.setType(QVariant::nameToType(_fields->item(r, 2)->data(Qt::EditRole).toString().toAscii().data()));
+      field.setType(QVariant::nameToType(_fields->item(r, 2)->data(Qt::EditRole).toString().toLatin1().data()));
 
       if (qobject_cast<QComboBox*>(_fields->cellWidget(r, 4)))
         field.setAction(CSVMapField::nameToAction(qobject_cast<QComboBox*>(_fields->cellWidget(r, 4))->currentText()));
@@ -378,7 +378,7 @@ void CSVAtlasWindow::sMapChanged( int )
       map = _atlas->map(_selectedMap);
 
       _table->setTitle(tr("Table: ") + map.table());
-      _table->setEnabled(TRUE);
+      _table->setEnabled(true);
 
       _action->setCurrentIndex(map.action());
       _description->setText(map.description());
@@ -491,7 +491,7 @@ void CSVAtlasWindow::sMapChanged( int )
         _fields->setCellWidget(row, 7, altspinner);
 
         QComboBox *altnullcombo = new QComboBox(_fields);
-        altnullcombo->addItems(CSVMapField::ifNullList(TRUE));
+        altnullcombo->addItems(CSVMapField::ifNullList(true));
         if (! mf.isEmpty())
           altnullcombo->setCurrentIndex(mf.ifNullActionAlt());
         _fields->setCellWidget(row, 8, altnullcombo);
@@ -512,7 +512,7 @@ void CSVAtlasWindow::sMapChanged( int )
     {
       _selectedMap = QString::null;
       _table->setTitle(tr("Table: "));
-      _table->setEnabled(FALSE);
+      _table->setEnabled(false);
     }
   }
   else

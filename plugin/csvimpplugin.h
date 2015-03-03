@@ -12,6 +12,7 @@
 #define __CSVIMPPLUGIN_H__
 
 #include <QObject>
+#include <QtGlobal>
 #include "csvimpplugininterface.h"
 
 #include "csvtoolwindow.h"
@@ -20,6 +21,9 @@ class CSVImpPlugin : public QObject, public CSVImpPluginInterface
 {
   Q_OBJECT
   Q_INTERFACES(CSVImpPluginInterface)
+#if QT_VERSION >= 0x050000
+  Q_PLUGIN_METADATA(IID "org.xtuple.Plugin.CSVImpPluginInterface/0.4")
+#endif
 
   public:
     CSVImpPlugin(QObject *parent = 0);

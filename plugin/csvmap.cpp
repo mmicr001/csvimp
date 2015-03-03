@@ -177,10 +177,10 @@ bool CSVMap::removeField(const QString & name)
     if(_fields.at(i).name() == name)
     {
       _fields.removeAt(i);
-      return TRUE;
+      return true;
     }
   }
-  return FALSE;
+  return false;
 }
 
 CSVMapField CSVMap::field(const QString & name) const
@@ -262,7 +262,7 @@ CSVMap::Action CSVMap::nameToAction(const QString & name)
 CSVMapField::CSVMapField(const QString & name)
 {
   _name = name;
-  _isKey = FALSE;
+  _isKey = false;
   _type  = QVariant::Invalid;
   _action = Action_Default;
   _column = 1;
@@ -275,7 +275,7 @@ CSVMapField::CSVMapField(const QString & name)
 CSVMapField::CSVMapField(const QDomElement & elem)
 {
   _name = QString::null;
-  _isKey = FALSE;
+  _isKey = false;
   _type  = QVariant::Invalid;
   _action = Action_Default;
   _column = 1;
@@ -293,9 +293,9 @@ CSVMapField::CSVMapField(const QDomElement & elem)
     if(elemThis.tagName() == "Name")
       setName(elemThis.text());
     else if(elemThis.tagName() == "isKey")
-      setIsKey(TRUE);
+      setIsKey(true);
     else if(elemThis.tagName() == "Type")
-      setType(QVariant::nameToType(elemThis.text().toAscii().data()));
+      setType(QVariant::nameToType(elemThis.text().toLatin1().data()));
     else if(elemThis.tagName() == "Action")
       action = nameToAction(elemThis.text());
     else if(elemThis.tagName() == "Column")
@@ -442,8 +442,8 @@ void CSVMapField::setAction(Action a)
 bool CSVMapField::isDefault() const
 {
   if(!_isKey && _action == Action_Default)
-    return TRUE;
-  return FALSE;
+    return true;
+  return false;
 }
 
 QString CSVMapField::ifNullToName(IfNull in)

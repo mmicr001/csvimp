@@ -72,7 +72,7 @@ class CSVMapField
 
     static QString ifNullToName(IfNull);
     static IfNull nameToIfNull(const QString &);
-    static QStringList ifNullList(bool altList = FALSE);
+    static QStringList ifNullList(bool altList = false);
 
     static QString actionToName(Action);
     static Action nameToAction(const QString &);

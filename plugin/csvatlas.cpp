@@ -89,10 +89,10 @@ bool CSVAtlas::removeMap(const QString & name)
     if(_maps.at(i).name() == name)
     {
       _maps.removeAt(i);
-      return TRUE;
+      return true;
     }
   }
-  return FALSE;
+  return false;
 }
 
 CSVMap CSVAtlas::map(const QString & name) const

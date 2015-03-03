@@ -16,8 +16,14 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QPixmap>
+#include <QtGlobal>
+#if QT_VERSION >= 0x050000
+#include <QtPrintSupport/QPrintDialog>
+#include <QtPrintSupport/QPrinter>
+#else
 #include <QPrintDialog>
 #include <QPrinter>
+#endif
 #include <QProgressDialog>
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -97,8 +103,8 @@ void CSVToolWindow::fileNew()
 
 void CSVToolWindow::fileOpen(QString filename)
 {
-  fileOpenAction->setEnabled(FALSE);
-  _firstRowHeader->setEnabled(FALSE);
+  fileOpenAction->setEnabled(false);
+  _firstRowHeader->setEnabled(false);
 
   if (filename.isEmpty())
     filename = QFileDialog::getOpenFileName(this, tr("Select CSV File"),
@@ -373,7 +379,7 @@ bool CSVToolWindow::importStart()
     mList.sort();
     bool valid;
     mapname = QInputDialog::getItem(this, tr("Select Map"), tr("Select Map:"),
-                                    mList, 0, FALSE, &valid);
+                                    mList, 0, false, &valid);
     if (!valid)
       return false;
   }
@@ -687,7 +693,7 @@ void CSVToolWindow::timerEvent( QTimerEvent * e )
 {
   if(e->timerId() == _dbTimerId)
   {
-    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,FALSE);
+    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection, false);
     if(db.isOpen())
     {
       QSqlQuery qry("SELECT CURRENT_DATE;");

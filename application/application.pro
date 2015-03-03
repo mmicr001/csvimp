@@ -60,5 +60,5 @@ HEADERS = ../csvimpcommon/csvimpdata.h  \
 SOURCES = main.cpp      \
           ../csvimpcommon/csvimpdata.cpp
 
-QT += sql
+QT += sql widgets
 RESOURCES += ../csvimpcommon/csvimp.qrc
