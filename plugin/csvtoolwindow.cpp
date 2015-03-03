@@ -16,8 +16,14 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QPixmap>
+#include <QtGlobal>
+#if QT_VERSION >= 0x050000
 #include <QtPrintSupport/QPrintDialog>
 #include <QtPrintSupport/QPrinter>
+#else
+#include <QPrintDialog>
+#include <QPrinter>
+#endif
 #include <QProgressDialog>
 #include <QSqlDatabase>
 #include <QSqlError>
