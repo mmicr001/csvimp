@@ -41,17 +41,13 @@ make %{?_smp_mflags}
 # make install doesn't do anything for this qmake project so we do
 # the installs manually
 #make INSTALL_ROOT=%{buildroot} install
-rm -f %{buildroot}%{_libdir}/lib*.a
+#rm -f %{buildroot}%{_libdir}/lib*.a
 mkdir -p %{buildroot}%{_bindir}
 install csvimp %{buildroot}%{_bindir}
 mkdir -p %{buildroot}/usr/lib/csvimp/plugins
 install plugins/libcsvimpplugin.so %{buildroot}/usr/lib/csvimp/plugins
 mkdir -p %{buildroot}%{_includedir}/csvimp
 find . -name '*.h' -exec install -m 0644 -D {} %{buildroot}%{_includedir}/csvimp/{} \;
-
-%post
-
-%postun
 
 %files 
 %{_bindir}/*
