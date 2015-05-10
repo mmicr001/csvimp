@@ -1,5 +1,5 @@
 Name: xtuple-csvimp
-Version: 0.5.0
+Version: 0.5.1
 Release: 1%{?dist}
 Summary: xTuple data import utility
 License: CPAL
@@ -29,7 +29,7 @@ This package provides the header files used by developers.
 %setup -q  -n csvimp-%{version}
 
 %build
-export HARDCODE_APPLICATION_DIR='\"/usr/lib/csvimp\"'
+export HARDCODE_APPLICATION_DIR=%{_libdir}/csvimp
 export USE_SHARED_OPENRPT=1
 export OPENRPT_HEADERS=/usr/include/openrpt
 export OPENRPT_LIBDIR=%{_libdir}
@@ -44,16 +44,24 @@ make %{?_smp_mflags}
 #rm -f %{buildroot}%{_libdir}/lib*.a
 mkdir -p %{buildroot}%{_bindir}
 install csvimp %{buildroot}%{_bindir}
-mkdir -p %{buildroot}/usr/lib/csvimp/plugins
-install plugins/libcsvimpplugin.so %{buildroot}/usr/lib/csvimp/plugins
+mkdir -p %{buildroot}%{_libdir}/csvimp/plugins
+install -m 0755 plugins/libcsvimpplugin.so %{buildroot}%{_libdir}/csvimp/plugins
 mkdir -p %{buildroot}%{_includedir}/csvimp
 find . -name '*.h' -exec install -m 0644 -D {} %{buildroot}%{_includedir}/csvimp/{} \;
+mkdir -p %{buildroot}%{_datadir}/csvimp/images
+cp -r csvimpcommon/images/* %{buildroot}%{_datadir}/csvimp/images
+mkdir -p %{buildroot}%{_datadir}/applications
+install -m 0644 *.desktop %{buildroot}%{_datadir}/applications
 
 %files 
 %{_bindir}/*
-%dir /usr/lib/csvimp
-%dir /usr/lib/csvimp/plugins
-/usr/lib/csvimp/plugins/libcsvimpplugin.so
+%dir %{_libdir}/csvimp
+%dir %{_libdir}/csvimp/plugins
+%{_libdir}/csvimp/plugins/libcsvimpplugin.so
+%{_datadir}/applications/*.desktop
+%dir %{_datadir}/csvimp
+%dir %{_datadir}/csvimp/images
+%{_datadir}/csvimp/images/*
 
 %files devel
 %dir %{_includedir}/csvimp/
