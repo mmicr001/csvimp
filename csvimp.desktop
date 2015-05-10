@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=xTuple CSV Import
+Icon=/usr/share/csvimp/images/CSVimpIcon.xpm
+Exec=csvimp
+Terminal=false
+Categories=Office;
