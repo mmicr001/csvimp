@@ -5,6 +5,7 @@ Summary: xTuple data import utility
 License: CPAL
 Url: http://www.xtuple.org/DataImportTool
 Source: https://github.com/xtuple/csvimp/archive/v%version.tar.gz
+BuildRequires: desktop-file-utils
 BuildRequires: qt-devel
 BuildRequires: xtuple-openrpt-devel
 
@@ -51,7 +52,7 @@ find . -name '*.h' -exec install -m 0644 -D {} %{buildroot}%{_includedir}/csvimp
 mkdir -p %{buildroot}%{_datadir}/csvimp/images
 cp -r csvimpcommon/images/* %{buildroot}%{_datadir}/csvimp/images
 mkdir -p %{buildroot}%{_datadir}/applications
-install -m 0644 *.desktop %{buildroot}%{_datadir}/applications
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications *.desktop
 
 %files 
 %{_bindir}/*
