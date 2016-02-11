@@ -226,22 +226,22 @@ void CSVData::setFirstRowHeaders(bool y)
 
 QString CSVData::header(int column)
 {
-  QString label;
+    QString label;
 
-  if (_firstRowHeaders && _data && _data->_header.size() > column) {
-    label = _data->_header.at(column);
-      if (label.isEmpty()) {
+    if (_firstRowHeaders && _data && _data->_header.size() > column) {
+        label = _data->_header.at(column);
+        if (label.isEmpty()) {
+            label = tr("unnamed");
+        }
+    }
+    else if (!_firstRowHeaders) {
+        label = QString::null;
+    }
+    else {
         label = tr("unnamed");
-      }
-  }
-  else if (!_firstRowHeaders) {
-    label = QString::null;
-  }
-  else {
-    label = tr("unnamed");
-  }
+    }
 
-  return label;
+    return label;
 }
 
 bool CSVData::load(QString filename, QWidget *parent)
