@@ -17,6 +17,7 @@ Makefile
 application/.DS_Store
 application/Makefile
 application/qrc_csvimp.cpp
+csvimp
 csvimp.app/
 csvimp.xcodeproj/
 macx.pri
