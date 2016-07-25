@@ -443,8 +443,9 @@ bool CSVToolWindow::importStart()
         if(usetransaction) QSqlQuery rollback("ROLLBACK;");
         _msghandler->message(QtWarningMsg, tr("Error"),
                              tr("<p>There was an error running the Pre SQL "
-                                "query. Please see the log for more details. "
-                                "Aborting transaction."));
+                                "query. "
+                                "Aborting transaction."
+                                "\n\n----------------------\n" + errMsg));
         return false;
       }
     }
@@ -642,7 +643,7 @@ bool CSVToolWindow::importStart()
       _msghandler->message(QtCriticalMsg, tr("Error"),
                            tr("<p>There was an error running the post sql "
                               "query and changes were rolled back. "
-                              "Please see the log for more details."));
+                              "\n\n----------------------\n" + errMsg));
       return false;
     }
   }
