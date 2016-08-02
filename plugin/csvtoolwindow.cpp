@@ -445,7 +445,7 @@ bool CSVToolWindow::importStart()
                              tr("<p>There was an error running the Pre SQL "
                                 "query. "
                                 "Aborting transaction."
-                                "\n\n----------------------\n" + errMsg));
+                                "\n\n----------------------\n%1").arg(errMsg));
         return false;
       }
     }
@@ -643,7 +643,7 @@ bool CSVToolWindow::importStart()
       _msghandler->message(QtCriticalMsg, tr("Error"),
                            tr("<p>There was an error running the post sql "
                               "query and changes were rolled back. "
-                              "\n\n----------------------\n" + errMsg));
+                              "\n\n----------------------\n%1").arg(errMsg));
       return false;
     }
   }
