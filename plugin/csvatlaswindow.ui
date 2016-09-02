@@ -138,11 +138,6 @@
                </item>
                <item>
                 <property name="text">
-                 <string>Update</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
                  <string>Append</string>
                 </property>
                </item>
