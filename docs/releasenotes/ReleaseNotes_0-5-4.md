@@ -1,5 +1,5 @@
 # xTuple CSV Import Release Notes
-## Version 0.5.3 - September, 2016
+## Version 0.5.4 - September, 2016
 
 ### Summary
 
