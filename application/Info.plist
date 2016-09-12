@@ -7,12 +7,12 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
         <key>CFBundleGetInfoString</key>
-	<string>0.5.3</string>
+	<string>0.5.4</string>
 	<key>CFBundleSignature</key>
 	<string>omfg</string>
 	<key>CFBundleExecutable</key>
 	<string>@EXECUTABLE@</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.xtuple.xTuple</string>
+	<string>com.xtuple.CSVImp</string>
 </dict>
 </plist>

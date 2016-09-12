@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2009 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -443,8 +443,9 @@ bool CSVToolWindow::importStart()
         if(usetransaction) QSqlQuery rollback("ROLLBACK;");
         _msghandler->message(QtWarningMsg, tr("Error"),
                              tr("<p>There was an error running the Pre SQL "
-                                "query. Please see the log for more details. "
-                                "Aborting transaction."));
+                                "query. "
+                                "Aborting transaction."
+                                "\n\n----------------------\n%1").arg(errMsg));
         return false;
       }
     }
@@ -642,7 +643,7 @@ bool CSVToolWindow::importStart()
       _msghandler->message(QtCriticalMsg, tr("Error"),
                            tr("<p>There was an error running the post sql "
                               "query and changes were rolled back. "
-                              "Please see the log for more details."));
+                              "\n\n----------------------\n%1").arg(errMsg));
       return false;
     }
   }
