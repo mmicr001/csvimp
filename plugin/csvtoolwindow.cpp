@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -12,6 +12,9 @@
 
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QImageWriter>
+#include <QImageReader>
+#include <QBuffer>
 #include <QList>
 #include <QMap>
 #include <QMessageBox>
@@ -32,6 +35,8 @@
 #include <QTextTableCell>
 #include <QTimerEvent>
 #include <QVariant>
+
+#include <quuencode.h>
 
 #include "csvatlas.h"
 #include "csvatlaswindow.h"
@@ -465,6 +470,11 @@ bool CSVToolWindow::importStart()
   QString value;
   QString label;
   QVariant var;
+  QImageWriter imageIo;
+  QBuffer  imageBuffer;
+  QString  imageString;
+  QString  _fileName;
+  CSVMapField::FileType filetype;
 
   QStringList errorList;
 
@@ -482,6 +492,7 @@ bool CSVToolWindow::importStart()
       {
         switch(fields.at(i).action())
         {
+          // Use Column Values
           case CSVMapField::Action_UseColumn:
           {
             value = _data->value(current, fields.at(i).column()-1);
@@ -536,6 +547,85 @@ bool CSVToolWindow::importStart()
               var = QVariant(value);
             break;
           }
+          // Load File from Column location and encode appropriately
+          case CSVMapField::Action_SetColumnFromDataFile:
+          {
+            value = _data->value(current, fields.at(i).column()-1);
+            filetype = (fields.at(i).fileType());
+ 
+            if(value.isNull())
+              var = QVariant(QString::null); // Nothing (error)
+            else
+            {
+              _fileName = value;
+              switch (filetype)
+              {
+                case CSVMapField::TYPE_IMAGE:
+                {
+                  if (_fileName.length() > 1)
+                  {
+                    if(!__image.load(_fileName))
+                    {
+                      QMessageBox::warning(this, tr("Could not load file"),
+                            tr( "Could not load file %1.\n"
+                                "The file is not an image, an unknown image format or is corrupt" ).arg(_fileName) );
+                      return false;
+                    }
+                  }
+
+                  if (__image.isNull())
+                  {
+                    QMessageBox::warning(this, tr("No Image Specified"),
+                      tr("You must load an image before you may save this record.") );
+                    return false;
+                  }
+
+                  imageBuffer.open(QIODevice::ReadWrite);
+                  imageIo.setDevice(&imageBuffer);
+                  imageIo.setFormat("PNG");
+
+                  if (!imageIo.write(__image))
+                  {
+                     QMessageBox::critical(this, tr("Error Saving Image"),
+                     tr("There was an error trying to save the image.") );
+                     return false;
+                  }
+
+                  imageBuffer.close();
+                  imageString = QUUEncode(imageBuffer);               
+                  var = QVariant(imageString);
+                  break;
+                }
+                case CSVMapField::TYPE_FILE:
+                {
+                  QByteArray  bytarr;
+                  QFileInfo fi(_fileName);
+
+                  if (!fi.exists())
+                  {
+                     QMessageBox::warning( this, tr("File Error"),
+                           tr("File %1 was not found and will not be saved.").arg(_fileName));
+                     return false;
+                  }
+
+                  QFile sourceFile(_fileName);
+                  if (!sourceFile.open(QIODevice::ReadOnly))
+                  {
+                    QMessageBox::warning( this, tr("File Open Error"),
+                             tr("Could not open source file %1 for read.")
+                                .arg(_fileName));
+                    return false;
+                  }
+                  bytarr = sourceFile.readAll();
+                  var = QVariant(bytarr);
+                  break;
+                }
+                default:
+                  var = QVariant(value);
+              }
+            }
+            break;
+          }
           case CSVMapField::Action_UseEmptyString:
           {
             var = QVariant(QString(""));
@@ -579,7 +669,6 @@ bool CSVToolWindow::importStart()
       query += front + back;
       QSqlQuery qry;
       qry.prepare(query);
-
       QMap<QString,QVariant>::iterator vit;
       for(vit = values.begin(); vit != values.end(); ++vit)
         qry.bindValue(vit.key(), vit.value());

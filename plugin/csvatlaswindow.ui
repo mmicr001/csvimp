@@ -290,6 +290,11 @@
            <string>Alt. Value</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>File Type</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>

@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -303,6 +303,11 @@ CSVMapField::CSVMapField(const QDomElement & elem)
       if(action == Action_Default) action = Action_UseColumn;
       setColumn(elemThis.text().toInt());
     }
+    else if(elemThis.tagName() == "ColumnFromFile")
+    {
+      action = Action_SetColumnFromDataFile;
+      setColumn(elemThis.text().toInt());
+    }
     else if(elemThis.tagName() == "AltColumn")
       setColumnAlt(elemThis.text().toInt());
     else if(elemThis.tagName() == "IfNull")
@@ -311,6 +316,8 @@ CSVMapField::CSVMapField(const QDomElement & elem)
       setIfNullActionAlt(nameToIfNull(elemThis.text()));
     else if(elemThis.tagName() == "AltValue")
       setValueAlt(elemThis.text());
+    else if(elemThis.tagName() == "FileType")
+      setFileType(nameToFileType(elemThis.text()));
     else
     {
       // ERROR
@@ -370,6 +377,37 @@ QDomElement CSVMapField::createElement(QDomDocument & doc)
       }
     }
   }
+  else if(_action == Action_SetColumnFromDataFile)
+  {
+    elemThis = doc.createElement("ColumnFromFile");
+    elemThis.appendChild(doc.createTextNode(QString("%1").arg(_column)));
+    elem.appendChild(elemThis);
+
+    elemThis = doc.createElement("FileType");
+    elemThis.appendChild(doc.createTextNode(fileTypeToName(_fileType)));
+    elem.appendChild(elemThis);
+
+    if(_ifNullAction != Nothing)
+    {
+      elemThis = doc.createElement("IfNull");
+      elemThis.appendChild(doc.createTextNode(ifNullToName(_ifNullAction)));
+      elem.appendChild(elemThis);
+    }
+
+    if(_ifNullAction == UseAlternateColumn)
+    {
+      elemThis = doc.createElement("AltColumn");
+      elemThis.appendChild(doc.createTextNode(QString("%1").arg(_columnAlt)));
+      elem.appendChild(elemThis);
+
+      if(_ifNullActionAlt != Nothing && _ifNullActionAlt != UseAlternateColumn)
+      {
+        elemThis = doc.createElement("AltIfNull");
+        elemThis.appendChild(doc.createTextNode(ifNullToName(_ifNullActionAlt)));
+        elem.appendChild(elemThis);
+      }
+    }
+  }
   else if(_action != Action_Default)
   {
     elemThis = doc.createElement("Action");
@@ -377,8 +415,8 @@ QDomElement CSVMapField::createElement(QDomDocument & doc)
     elem.appendChild(elemThis);
   }
 
-  if(_action == Action_UseAlternateValue
-    || (_action == Action_UseColumn
+  if((_action == Action_UseAlternateValue || _action == Action_SetColumnFromDataFile)
+    || ((_action == Action_UseColumn || _action == Action_SetColumnFromDataFile)
       && (_ifNullAction == UseAlternateValue
        || _ifNullActionAlt == UseAlternateValue) ) )
   {
@@ -439,6 +477,11 @@ void CSVMapField::setAction(Action a)
   _action = a;
 }
 
+void CSVMapField::setFileType(FileType ft)
+{
+  _fileType = ft;
+}
+
 bool CSVMapField::isDefault() const
 {
   if(!_isKey && _action == Action_Default)
@@ -496,6 +539,8 @@ QString CSVMapField::actionToName(Action a)
     str = "UseAlternateValue";
   else if(Action_UseNull == a)
     str = "UseNull";
+  else if(Action_SetColumnFromDataFile == a)
+    str = "SetColumnFromDataFile";
   return str;
 }
 
@@ -509,6 +554,8 @@ CSVMapField::Action CSVMapField::nameToAction(const QString & name)
     return Action_UseAlternateValue;
   else if("UseNull" == name)
     return Action_UseNull;
+  else if("SetColumnFromDataFile" == name)
+    return Action_SetColumnFromDataFile;
   return Action_Default;
 }
 
@@ -520,5 +567,39 @@ QStringList CSVMapField::actionList()
   list << "UseEmptyString";
   list << "UseAlternateValue";
   list << "UseNull";
+  list << "SetColumnFromDataFile";
+  return list;
+}
+
+QString CSVMapField::fileTypeToName(FileType ft)
+{
+  QString str = "N/A";
+  if(TYPE_FILE == ft)
+    str = "File";
+  else if(TYPE_IMAGE == ft)
+    str = "Image";
+  else if(TYPE_URL == ft)
+    str = "URL";
+  return str;
+}
+
+CSVMapField::FileType CSVMapField::nameToFileType(const QString & name)
+{
+  if("File" == name)
+    return TYPE_FILE;
+  else if("Image" == name)
+    return TYPE_IMAGE;
+  else if("URL" == name)
+    return TYPE_URL;
+  return TYPE_NA;
+}
+
+QStringList CSVMapField::fileList()
+{
+  QStringList list;
+  list << "N/A";
+  list << "File";
+  list << "Image";
+  list << "URL";
   return list;
 }

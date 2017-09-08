@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -27,6 +27,7 @@ RowController::RowController(QTableWidget *table, int row, QObject *parent, cons
   _altColumn = 0;
   _altIfNull = 0;
   _altValue = 0;
+  _fileType = 0;
   connect(table, SIGNAL(cellChanged(int, int)), this, SLOT(valueChanged(int, int)));
 }
 
@@ -39,6 +40,7 @@ RowController::~RowController()
   _altColumn = 0;
   _altIfNull = 0;
   _altValue = 0;
+  _fileType = 0;
 }
 
 void RowController::setAction(QComboBox *combo)
@@ -74,6 +76,11 @@ void RowController::setAltIfNull(QComboBox *combo)
 void RowController::setAltValue(QTableWidgetItem *item)
 {
   _altValue = item;
+}
+
+void RowController::setFileType(QComboBox *combo)
+{
+  _fileType = combo;
 }
 
 void RowController::finishSetup()
@@ -123,6 +130,13 @@ void RowController::finishSetup()
         _altValue->setFlags(_altValue->flags() & (~ Qt::ItemIsEditable));
     }
   }
+  else if (str == "SetColumnFromDataFile")
+  {
+    _column->setEnabled(true);
+    _ifNull->setEnabled(false);
+    _altColumn->setEnabled(false);
+    _altIfNull->setEnabled(false);
+  }
   else if(str == "UseAlternateValue")
   {
     _column->setEnabled(false);
@@ -131,6 +145,9 @@ void RowController::finishSetup()
     _altIfNull->setEnabled(false);
     _altValue->setFlags(_altValue->flags() | Qt::ItemIsEditable);
   }
+
+  _fileType->setEnabled(_action->currentText() == "SetColumnFromDataFile");
+
 }
 
 void RowController::valueChanged(int row, int col)
