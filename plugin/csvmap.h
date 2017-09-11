@@ -61,6 +61,7 @@ class CSVMapField
     enum FileType {
       TYPE_NA,
       TYPE_FILE,
+      TYPE_IMAGEENC,
       TYPE_IMAGE,
       TYPE_URL
     };

@@ -42,6 +42,8 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     void helpAbout();
     void helpContents();
     void helpIndex();
+    QVariant imageLoadAndEncode(QString fileName, bool enc = false);
+    QVariant docLoadAndEncode(QString fileName);
     bool importStart();
     void mapEdit();
     void sFirstRowHeader(bool yes);

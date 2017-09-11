@@ -365,7 +365,7 @@ void CSVAtlasWindow::sMapChanged( int )
       if (qobject_cast<QComboBox*>(_fields->cellWidget(r, 10)))
         field.setFileType(CSVMapField::nameToFileType(qobject_cast<QComboBox*>(_fields->cellWidget(r, 10))->currentText()));
       else
-        field.setFileType(CSVMapField::TYPE_IMAGE);
+        field.setFileType(CSVMapField::TYPE_IMAGEENC);
 
       map.setField(field);
     }
@@ -518,7 +518,7 @@ void CSVAtlasWindow::sMapChanged( int )
         control->setAltColumn(altspinner);
         control->setAltIfNull(altnullcombo);
         control->setAltValue(_fields->item(row, 9));
-        control->setFileType(filetypecombo);     
+        control->setFileType(filetypecombo);
         control->finishSetup();
       }
     }

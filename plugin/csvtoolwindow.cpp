@@ -470,9 +470,6 @@ bool CSVToolWindow::importStart()
   QString value;
   QString label;
   QVariant var;
-  QImageWriter imageIo;
-  QBuffer  imageBuffer;
-  QString  imageString;
   QString  _fileName;
   CSVMapField::FileType filetype;
 
@@ -552,7 +549,7 @@ bool CSVToolWindow::importStart()
           {
             value = _data->value(current, fields.at(i).column()-1);
             filetype = (fields.at(i).fileType());
- 
+
             if(value.isNull())
               var = QVariant(QString::null); // Nothing (error)
             else
@@ -562,62 +559,23 @@ bool CSVToolWindow::importStart()
               {
                 case CSVMapField::TYPE_IMAGE:
                 {
-                  if (_fileName.length() > 1)
-                  {
-                    if(!__image.load(_fileName))
-                    {
-                      QMessageBox::warning(this, tr("Could not load file"),
-                            tr( "Could not load file %1.\n"
-                                "The file is not an image, an unknown image format or is corrupt" ).arg(_fileName) );
-                      return false;
-                    }
-                  }
-
-                  if (__image.isNull())
-                  {
-                    QMessageBox::warning(this, tr("No Image Specified"),
-                      tr("You must load an image before you may save this record.") );
-                    return false;
-                  }
-
-                  imageBuffer.open(QIODevice::ReadWrite);
-                  imageIo.setDevice(&imageBuffer);
-                  imageIo.setFormat("PNG");
-
-                  if (!imageIo.write(__image))
-                  {
-                     QMessageBox::critical(this, tr("Error Saving Image"),
-                     tr("There was an error trying to save the image.") );
-                     return false;
-                  }
-
-                  imageBuffer.close();
-                  imageString = QUUEncode(imageBuffer);               
-                  var = QVariant(imageString);
+                  var = imageLoadAndEncode(_fileName);
+                  if (var == false)
+                    var = QVariant(QString::null); // Nothing (error)
+                  break;
+                }
+                case CSVMapField::TYPE_IMAGEENC:
+                {
+                  var = imageLoadAndEncode(_fileName, true);
+                  if (var == false)
+                    var = QVariant(QString::null); // Nothing (error)
                   break;
                 }
                 case CSVMapField::TYPE_FILE:
                 {
-                  QByteArray  bytarr;
-                  QFileInfo fi(_fileName);
-
-                  if (!fi.exists())
-                  {
-                     QMessageBox::warning( this, tr("File Error"),
-                           tr("File %1 was not found and will not be saved.").arg(_fileName));
-                     return false;
-                  }
-
-                  QFile sourceFile(_fileName);
-                  if (!sourceFile.open(QIODevice::ReadOnly))
-                  {
-                    QMessageBox::warning( this, tr("File Open Error"),
-                             tr("Could not open source file %1 for read.")
-                                .arg(_fileName));
-                    return false;
-                  }
-                  bytarr = sourceFile.readAll();
-                  var = QVariant(bytarr);
+                  var = docLoadAndEncode(_fileName);
+                  if (var == false)
+                    var = QVariant(QString::null); // Nothing (error)
                   break;
                 }
                 default:
@@ -755,6 +713,71 @@ bool CSVToolWindow::importStart()
   }
 
   return false;
+}
+
+QVariant CSVToolWindow::imageLoadAndEncode(QString fileName, bool enc)
+{
+  QImageWriter imageIo;
+  QBuffer  imageBuffer;
+  QString  imageString;
+
+  if (fileName.length() > 1)
+  {
+    if(!__image.load(fileName))
+    {
+       QMessageBox::warning(this, tr("Could not load file"),
+                   tr( "Could not load file %1.\n"
+                       "The file is not an image, an unknown image format or is corrupt" ).arg(fileName) );
+       return false;
+    }
+  }
+
+  if (__image.isNull())
+  {
+    QMessageBox::warning(this, tr("No Image Specified"),
+               tr("You must load an image before you may save this record.") );
+    return false;
+  }
+
+  imageBuffer.open(QIODevice::ReadWrite);
+  imageIo.setDevice(&imageBuffer);
+  imageIo.setFormat("PNG");
+
+  if (!imageIo.write(__image))
+  {
+    QMessageBox::critical(this, tr("Error Saving Image"),
+               tr("There was an error trying to save the image (%1).").arg(fileName) );
+    return false;
+  }
+
+  imageBuffer.close();
+  imageString = enc ? QUUEncode(imageBuffer) : imageBuffer.buffer();
+
+  return QVariant(imageString);
+}
+
+QVariant CSVToolWindow::docLoadAndEncode(QString fileName)
+{
+  QByteArray  bytarr;
+  QFileInfo fi(fileName);
+
+  if (!fi.exists())
+  {
+    QMessageBox::warning( this, tr("File Error"),
+       tr("File %1 was not found and will not be saved.").arg(fileName));
+    return false;
+  }
+
+  QFile sourceFile(fileName);
+  if (!sourceFile.open(QIODevice::ReadOnly))
+  {
+    QMessageBox::warning( this, tr("File Open Error"),
+             tr("Could not open source file %1 for read.")
+                        .arg(fileName));
+    return false;
+  }
+  bytarr = sourceFile.readAll();
+  return QVariant(bytarr);
 }
 
 void CSVToolWindow::sImportViewLog()

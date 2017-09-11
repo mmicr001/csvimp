@@ -576,8 +576,10 @@ QString CSVMapField::fileTypeToName(FileType ft)
   QString str = "N/A";
   if(TYPE_FILE == ft)
     str = "File";
+  else if(TYPE_IMAGEENC == ft)
+    str = "Encoded Image";
   else if(TYPE_IMAGE == ft)
-    str = "Image";
+    str = "Raw Image";
   else if(TYPE_URL == ft)
     str = "URL";
   return str;
@@ -587,7 +589,9 @@ CSVMapField::FileType CSVMapField::nameToFileType(const QString & name)
 {
   if("File" == name)
     return TYPE_FILE;
-  else if("Image" == name)
+  else if("Encoded Image" == name)
+    return TYPE_IMAGEENC;
+  else if("Raw Image" == name)
     return TYPE_IMAGE;
   else if("URL" == name)
     return TYPE_URL;
@@ -599,7 +603,8 @@ QStringList CSVMapField::fileList()
   QStringList list;
   list << "N/A";
   list << "File";
-  list << "Image";
+  list << "Encoded Image";
+  list << "Raw Image";
   list << "URL";
   return list;
 }
