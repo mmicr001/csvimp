@@ -33,6 +33,7 @@ class CSVAtlasWindow : public QMainWindow, public Ui::CSVAtlasWindow
     virtual void        fileSave();
     virtual void        fileSaveAs();
     virtual CSVAtlas   *getAtlas();
+    virtual bool        hasKey();
     virtual void        helpAbout();
     virtual void        helpContents();
     virtual void        helpIndex();

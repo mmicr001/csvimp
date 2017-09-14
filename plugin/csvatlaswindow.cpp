@@ -143,6 +143,16 @@ void CSVAtlasWindow::fileSave()
     if(_filename.isEmpty())
       return;
   }
+
+  if (tr("Update") == _action->currentText() || tr("Append") == _action->currentText())
+  {
+    if (!hasKey())
+    {
+      _msghandler->message(QtWarningMsg, tr("You must specify Key field(s) with action Update/Append"));
+      return;
+    }
+  }
+
   sMapChanged(_map->currentIndex());
 
   QDomDocument doc = QDomDocument("openCSVAtlasDef");
@@ -532,6 +542,17 @@ void CSVAtlasWindow::sMapChanged( int )
   else
     _msghandler->message(QtCriticalMsg, tr("No Database"),
                          tr("Could not get the database connection."));
+}
+
+bool CSVAtlasWindow::hasKey()
+{
+  for(int r = 0; r < _fields->rowCount(); r++)
+  {
+    bool _hasKey =qobject_cast<QCheckBox*>(_fields->cellWidget(r,0))->isChecked();
+    if (_hasKey)
+      return true;
+  }
+  return false;
 }
 
 void CSVAtlasWindow::closeEvent( QCloseEvent * e)

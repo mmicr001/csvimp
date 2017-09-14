@@ -12,6 +12,7 @@
 #define CSVTOOLWINDOW_H
 
 #include "ui_csvtoolwindow.h"
+#include "csvmap.h"
 
 class CSVAtlasWindow;
 class CSVData;
@@ -42,6 +43,8 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     void helpAbout();
     void helpContents();
     void helpIndex();
+    void insertAction(bool append = false);
+    void updateAction();
     QVariant imageLoadAndEncode(QString fileName, bool enc = false);
     QVariant docLoadAndEncode(QString fileName);
     bool importStart();
@@ -66,8 +69,14 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     void populate();
 
   private:
-    QImage __image;
-
+    QImage      __image;
+    int         _total;
+    int         _current;
+    int         _error;
+    int         _ignored;
+    QStringList _errorList;
+    QString     _errMsg;
+    CSVMap map;
 };
 
 #endif
