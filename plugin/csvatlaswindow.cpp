@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -143,6 +143,16 @@ void CSVAtlasWindow::fileSave()
     if(_filename.isEmpty())
       return;
   }
+
+  if (tr("Update") == _action->currentText() || tr("Append") == _action->currentText())
+  {
+    if (!hasKey())
+    {
+      _msghandler->message(QtWarningMsg, tr("You must specify Key field(s) with action Update/Append"));
+      return;
+    }
+  }
+
   sMapChanged(_map->currentIndex());
 
   QDomDocument doc = QDomDocument("openCSVAtlasDef");
@@ -361,6 +371,12 @@ void CSVAtlasWindow::sMapChanged( int )
         field.setIfNullActionAlt(CSVMapField::Nothing);
 
       field.setValueAlt(_fields->item(r, 9)->data(Qt::EditRole).toString());
+
+      if (qobject_cast<QComboBox*>(_fields->cellWidget(r, 10)))
+        field.setFileType(CSVMapField::nameToFileType(qobject_cast<QComboBox*>(_fields->cellWidget(r, 10))->currentText()));
+      else
+        field.setFileType(CSVMapField::TYPE_IMAGEENC);
+
       map.setField(field);
     }
     map.simplify();
@@ -498,6 +514,13 @@ void CSVAtlasWindow::sMapChanged( int )
 
         _fields->setItem(row, 9, new QTableWidgetItem(mf.valueAlt()));
 
+        QComboBox *filetypecombo = new QComboBox(_fields);
+        filetypecombo->addItems(CSVMapField::fileList());
+        if (! mf.isEmpty())
+          filetypecombo->setCurrentIndex(mf.fileType());
+        _fields->setCellWidget(row, 10, filetypecombo);
+
+
         RowController *control = new RowController(_fields, row, colspinner);
         control->setAction(actcombo);
         control->setColumn(colspinner);
@@ -505,6 +528,7 @@ void CSVAtlasWindow::sMapChanged( int )
         control->setAltColumn(altspinner);
         control->setAltIfNull(altnullcombo);
         control->setAltValue(_fields->item(row, 9));
+        control->setFileType(filetypecombo);
         control->finishSetup();
       }
     }
@@ -518,6 +542,17 @@ void CSVAtlasWindow::sMapChanged( int )
   else
     _msghandler->message(QtCriticalMsg, tr("No Database"),
                          tr("Could not get the database connection."));
+}
+
+bool CSVAtlasWindow::hasKey()
+{
+  for(int r = 0; r < _fields->rowCount(); r++)
+  {
+    bool _hasKey =qobject_cast<QCheckBox*>(_fields->cellWidget(r,0))->isChecked();
+    if (_hasKey)
+      return true;
+  }
+  return false;
 }
 
 void CSVAtlasWindow::closeEvent( QCloseEvent * e)

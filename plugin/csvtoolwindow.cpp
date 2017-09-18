@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -12,6 +12,9 @@
 
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QImageWriter>
+#include <QImageReader>
+#include <QBuffer>
 #include <QList>
 #include <QMap>
 #include <QMessageBox>
@@ -32,6 +35,8 @@
 #include <QTextTableCell>
 #include <QTimerEvent>
 #include <QVariant>
+
+#include <quuencode.h>
 
 #include "csvatlas.h"
 #include "csvatlaswindow.h"
@@ -384,7 +389,7 @@ bool CSVToolWindow::importStart()
       return false;
   }
 
-  CSVMap map = atlas->map(mapname);
+  map = atlas->map(mapname);
   map.simplify();
   QList<CSVMapField> fields = map.fields();
 
@@ -396,7 +401,8 @@ bool CSVToolWindow::importStart()
   }
 
   CSVMap::Action action = map.action();
-  if (action != CSVMap::Insert)
+
+  if (!(action == CSVMap::Insert || action == CSVMap::Update || action == CSVMap::Append) )
   {
     _msghandler->message(QtWarningMsg, tr("Action not implemented"),
                          tr("<p>The action %1 for this map is not supported.")
@@ -412,24 +418,26 @@ bool CSVToolWindow::importStart()
     return false;
   }
 
-  int total = _data->rows();
-  int current = 0, error = 0, ignored = 0;
+  _total = _data->rows();
+  _current = 0;
+  _error = 0;
+  _ignored = 0;
 
   if (! _log)
     _log = new LogWindow(this);
 
   if(usetransaction) QSqlQuery begin("BEGIN;");
 
-  QString errMsg;
+  _errMsg = QString("");
   if(!map.sqlPre().trimmed().isEmpty())
   {
     if(usetransaction) QSqlQuery savepoint("SAVEPOINT presql;");
     QSqlQuery pre;
     if(!pre.exec(map.sqlPre()))
     {
-      errMsg = QString("ERROR Running Pre SQL query: %1").arg(pre.lastError().text());
+      _errMsg = QString("ERROR Running Pre SQL query: %1").arg(pre.lastError().text());
       _log->_log->append("\n\n----------------------\n");
-      _log->_log->append(errMsg);
+      _log->_log->append(_errMsg);
       _log->show();
       _log->raise();
       if(map.sqlPreContinueOnError())
@@ -445,167 +453,56 @@ bool CSVToolWindow::importStart()
                              tr("<p>There was an error running the Pre SQL "
                                 "query. "
                                 "Aborting transaction."
-                                "\n\n----------------------\n%1").arg(errMsg));
+                                "\n\n----------------------\n%1").arg(_errMsg));
         return false;
       }
     }
   }
 
   QString progresstext(tr("Importing %1: %2 rows out of %3"));
-  int expected = total;
+  int expected = _total;
   QProgressDialog *progress = new QProgressDialog(progresstext
                                         .arg(map.name()).arg(0).arg(expected),
                                         tr("Cancel"), 0, expected, this);
   progress->setWindowModality(Qt::WindowModal);
   bool userCanceled = false;
 
-  QString query;
-  QString front;
-  QString back;
-  QString value;
-  QString label;
-  QVariant var;
-
-  QStringList errorList;
-
-  for(current = 0; current < total; ++current)
+  for(_current = 0; _current < _total; ++_current)
   {
     if(usetransaction) QSqlQuery savepoint("SAVEPOINT csvinsert;");
-    if(action == CSVMap::Insert)
+    switch(action)
     {
-      query = QString("INSERT INTO %1 ").arg(map.table());
-      front = "(";
-      back = " VALUES(";
-      QList<CSVMapField> fields = map.fields();
-      QMap<QString,QVariant> values;
-      for (int i = 0; i < fields.size(); i++)
+      case CSVMap::Insert:  // INSERT new records
       {
-        switch(fields.at(i).action())
-        {
-          case CSVMapField::Action_UseColumn:
-          {
-            value = _data->value(current, fields.at(i).column()-1);
-            if(value.isNull())
-            {
-              switch (fields.at(i).ifNullAction())
-              {
-                case CSVMapField::UseDefault:
-                  continue;
-                case CSVMapField::UseEmptyString:
-                {
-                  var = QVariant(QString(""));
-                  break;
-                }
-                case CSVMapField::UseAlternateValue:
-                {
-                  var = QVariant(fields.at(i).valueAlt());
-                  break;
-                }
-                case CSVMapField::UseAlternateColumn:
-                {
-                  value = _data->value(current, fields.at(i).columnAlt()-1);
-                  if(value.isNull())
-                  {
-                    switch (fields.at(i).ifNullActionAlt())
-                    {
-                      case CSVMapField::UseDefault:
-                        continue;
-                      case CSVMapField::UseEmptyString:
-                      {
-                        var = QVariant(QString(""));
-                        break;
-                      }
-                      case CSVMapField::UseAlternateValue:
-                      {
-                        var = QVariant(fields.at(i).valueAlt());
-                        break;
-                      }
-                      default: // Nothing
-                        var = QVariant(QString::null);
-                    }
-                  }
-                  else
-                    var = QVariant(value);
-                  break;
-                }
-                default: // Nothing
-                  var = QVariant(QString::null);
-              }
-            }
-            else
-              var = QVariant(value);
-            break;
-          }
-          case CSVMapField::Action_UseEmptyString:
-          {
-            var = QVariant(QString(""));
-            break;
-          }
-          case CSVMapField::Action_UseAlternateValue:
-          {
-            var = QVariant(fields.at(i).valueAlt());
-            break;
-          }
-          case CSVMapField::Action_UseNull:
-          {
-            var = QVariant(QString::null);
-            break;
-          }
-          default:
-            continue;
-        }
-
-        label = ":" + fields.at(i).name();
-        if(!values.empty())
-        {
-          front += ", ";
-          back  += ", ";
-        }
-        values.insert(label, var);
-        front += fields.at(i).name();
-        back  += label;
+        insertAction();
+        break;
       }
-
-      if(values.empty())
+      case CSVMap::Update: // UPDATE existing records
       {
-        ignored++;
-        errMsg = QString("IGNORED Record %1: There are no columns to insert").arg(current+1);
-        errorList.append(errMsg);
-        continue;
+        updateAction();
+        break;
       }
-
-      front += ") ";
-      back += ")";
-      query += front + back;
-      QSqlQuery qry;
-      qry.prepare(query);
-
-      QMap<QString,QVariant>::iterator vit;
-      for(vit = values.begin(); vit != values.end(); ++vit)
-        qry.bindValue(vit.key(), vit.value());
-
-      if(!qry.exec())
+      case CSVMap::Append: // APPEND new records, ignore existing
       {
-        if(usetransaction) QSqlQuery sprollback("ROLLBACK TO SAVEPOINT csvinsert;");
-        error++;
-        errMsg = QString("ERROR Record %1: %2").arg(current+1).arg(qry.lastError().text());
-        errorList.append(errMsg);
+        insertAction(true);
+        break;
       }
     }
+
     if (progress->wasCanceled())
     {
       userCanceled = true;
       break;
     }
-    if(! (current % 1000))
+    if(! (_current % 1000))
     {
-      progress->setLabelText(progresstext.arg(map.name()).arg(current).arg(expected));
-      progress->setValue(current);
+      progress->setLabelText(progresstext.arg(map.name()).arg(_current).arg(expected));
+      progress->setValue(_current);
     }
   }
-  progress->setValue(total);
+  progress->setValue(_total);
 
-  if (error || ignored || userCanceled)
+  if (_error || _ignored || userCanceled)
   {
     _log->_log->append(tr("Map: %1\n"
                           "Table: %2\n"
@@ -616,15 +513,15 @@ bool CSVToolWindow::importStart()
                           "# Errors:      %7\n\n")
                           .arg(map.name()).arg(map.table())
                           .arg(CSVMap::actionToName(map.action()))
-                          .arg(total).arg(current).arg(ignored).arg(error));
-    _log->_log->append(errMsg);
-    _log->_log->append(errorList.join("\n"));
+                          .arg(_total).arg(_current).arg(_ignored).arg(_error));
+    _log->_log->append(_errMsg);
+    _log->_log->append(_errorList.join("\n"));
     _log->show();
     _log->raise();
     if (_msghandler &&  // log messages there's a non-interactive message handler
         qobject_cast<XAbstractMessageHandler*>(_msghandler) &&
         ! qobject_cast<InteractiveMessageHandler*>(_msghandler))
-      _msghandler->message(error ? QtCriticalMsg : QtWarningMsg,
+      _msghandler->message(_error ? QtCriticalMsg : QtWarningMsg,
                            tr("Import Processing Status"),
                            _log->_log->toPlainText());
   }
@@ -634,16 +531,16 @@ bool CSVToolWindow::importStart()
     QSqlQuery post;
     if(!post.exec(map.sqlPost()))
     {
-      errMsg = QString("ERROR Running Post SQL query: %1").arg(post.lastError().text());
+      _errMsg = QString("ERROR Running Post SQL query: %1").arg(post.lastError().text());
       _log->_log->append("\n\n----------------------\n");
-      _log->_log->append(errMsg);
+      _log->_log->append(_errMsg);
       _log->show();
       _log->raise();
       if(usetransaction) QSqlQuery rollback("ROLLBACK;");
       _msghandler->message(QtCriticalMsg, tr("Error"),
                            tr("<p>There was an error running the post sql "
                               "query and changes were rolled back. "
-                              "\n\n----------------------\n%1").arg(errMsg));
+                              "\n\n----------------------\n%1").arg(_errMsg));
       return false;
     }
   }
@@ -657,7 +554,7 @@ bool CSVToolWindow::importStart()
   }
 
   if(usetransaction) QSqlQuery commit("COMMIT");
-  if (! error)
+  if (! _error)
   {
     _msghandler->message(QtDebugMsg, tr("Import Complete"),
                          tr("The import of %1 completed successfully.")
@@ -666,6 +563,431 @@ bool CSVToolWindow::importStart()
   }
 
   return false;
+}
+
+void CSVToolWindow::insertAction( bool append )
+{
+  QString query;
+  QString front;
+  QString back;
+  QString wherenot;
+  QString value;
+  QString label;
+  QVariant var;
+  QString  _fileName;
+  CSVMapField::FileType filetype;
+
+  query = QString("INSERT INTO %1 ").arg(map.table());
+  wherenot = QString(" WHERE NOT EXISTS (SELECT 1 FROM %1 WHERE ").arg(map.table());
+  front = "(";
+  back = append ? " SELECT " : " VALUES(";
+  QList<CSVMapField> fields = map.fields();
+  QMap<QString,QVariant> values;
+  QMap<QString,QVariant> wheres;
+  for (int i = 0; i < fields.size(); i++)
+  {
+    switch(fields.at(i).action())
+    {
+      // Use Column Values
+      case CSVMapField::Action_UseColumn:
+      {
+        value = _data->value(_current, fields.at(i).column()-1);
+        if(value.isNull())
+        {
+          switch (fields.at(i).ifNullAction())
+          {
+            case CSVMapField::UseDefault:
+              continue;
+            case CSVMapField::UseEmptyString:
+            {
+              var = QVariant(QString(""));
+              break;
+            }
+            case CSVMapField::UseAlternateValue:
+            {
+              var = QVariant(fields.at(i).valueAlt());
+              break;
+            }
+            case CSVMapField::UseAlternateColumn:
+            {
+              value = _data->value(_current, fields.at(i).columnAlt()-1);
+              if(value.isNull())
+              {
+                switch (fields.at(i).ifNullActionAlt())
+                {
+                  case CSVMapField::UseDefault:
+                    continue;
+                  case CSVMapField::UseEmptyString:
+                  {
+                    var = QVariant(QString(""));
+                    break;
+                  }
+                  case CSVMapField::UseAlternateValue:
+                  {
+                    var = QVariant(fields.at(i).valueAlt());
+                    break;
+                  }
+                  default: // Nothing
+                    var = QVariant(QString::null);
+                }
+              }
+              else
+                var = QVariant(value);
+              break;
+            }
+            default: // Nothing
+              var = QVariant(QString::null);
+          }
+        }
+        else
+          var = QVariant(value);
+        break;
+      }
+      // Load File from Column location and encode appropriately
+      case CSVMapField::Action_SetColumnFromDataFile:
+      {
+        value = _data->value(_current, fields.at(i).column()-1);
+        filetype = (fields.at(i).fileType());
+
+        if(value.isNull())
+          var = QVariant(QString::null); // Nothing (error)
+        else
+        {
+          _fileName = value;
+          switch (filetype)
+          {
+            case CSVMapField::TYPE_IMAGE:
+            {
+              var = imageLoadAndEncode(_fileName);
+              if (var == false)
+                var = QVariant(QString::null); // Nothing (error)
+              break;
+            }
+            case CSVMapField::TYPE_IMAGEENC:
+            {
+              var = imageLoadAndEncode(_fileName, true);
+              if (var == false)
+                var = QVariant(QString::null); // Nothing (error)
+              break;
+            }
+            case CSVMapField::TYPE_FILE:
+            {
+              var = docLoadAndEncode(_fileName);
+              if (var == false)
+                var = QVariant(QString::null); // Nothing (error)
+              break;
+            }
+            default:
+              var = QVariant(value);
+          }
+        }
+        break;
+      }
+      case CSVMapField::Action_UseEmptyString:
+      {
+        var = QVariant(QString(""));
+        break;
+      }
+      case CSVMapField::Action_UseAlternateValue:
+      {
+        var = QVariant(fields.at(i).valueAlt());
+        break;
+      }
+      case CSVMapField::Action_UseNull:
+      {
+       var = QVariant(QString::null);
+        break;
+      }
+      default:
+        continue;
+    }
+
+    label = ":" + fields.at(i).name();
+    if(!values.empty())
+    {
+      front += ", ";
+      back  += ", ";
+    }
+    values.insert(label, var);
+    front += fields.at(i).name();
+    back  += label;
+    if (append && fields.at(i).isKey())
+    {
+      if(!wheres.empty())
+        wherenot += " AND ";
+      wherenot += fields.at(i).name() + "=" + label;
+      wheres.insert(label, var);
+    }
+  }
+
+  if(values.empty())
+  {
+    _ignored++;
+    _errMsg = QString("IGNORED Record %1: There are no columns to append").arg(_current+1);
+    _errorList.append(_errMsg);
+    return;
+  }
+
+  front += ") ";
+  back += append ? " " : ")";
+  query += front + back;
+  if (append)
+    query += wherenot + ");";
+  QSqlQuery qry;
+  qry.prepare(query);
+  QMap<QString,QVariant>::iterator vit;
+  for(vit = values.begin(); vit != values.end(); ++vit)
+    qry.bindValue(vit.key(), vit.value());
+
+  if(!qry.exec())
+  {
+    if(usetransaction) QSqlQuery sprollback("ROLLBACK TO SAVEPOINT csvinsert;");
+    _error++;
+    _errMsg = QString("ERROR Record %1: %2").arg(_current+1).arg(qry.lastError().text());
+    _errorList.append(_errMsg);
+  }
+}
+
+void CSVToolWindow::updateAction()
+{
+  QString query;
+  QString set;
+  QString where;
+  QString value;
+  QString label;
+  QVariant var;
+  QString  _fileName;
+  CSVMapField::FileType filetype;
+
+  query = QString("UPDATE %1 SET ").arg(map.table());
+  where = QString(" WHERE ");
+  QList<CSVMapField> fields = map.fields();
+  QMap<QString,QVariant> values;
+  QMap<QString,QVariant> wheres;
+  for (int i = 0; i < fields.size(); i++)
+  {
+    switch(fields.at(i).action())
+    {
+      // Use Column Values
+      case CSVMapField::Action_UseColumn:
+      {
+        value = _data->value(_current, fields.at(i).column()-1);
+        if(value.isNull())
+        {
+          switch (fields.at(i).ifNullAction())
+          {
+            case CSVMapField::UseDefault:
+              continue;
+            case CSVMapField::UseEmptyString:
+            {
+              var = QVariant(QString(""));
+              break;
+            }
+            case CSVMapField::UseAlternateValue:
+            {
+              var = QVariant(fields.at(i).valueAlt());
+              break;
+            }
+            case CSVMapField::UseAlternateColumn:
+            {
+              value = _data->value(_current, fields.at(i).columnAlt()-1);
+              if(value.isNull())
+              {
+                switch (fields.at(i).ifNullActionAlt())
+                {
+                  case CSVMapField::UseDefault:
+                    continue;
+                  case CSVMapField::UseEmptyString:
+                  {
+                    var = QVariant(QString(""));
+                    break;
+                  }
+                  case CSVMapField::UseAlternateValue:
+                  {
+                    var = QVariant(fields.at(i).valueAlt());
+                    break;
+                  }
+                  default: // Nothing
+                    var = QVariant(QString::null);
+                }
+              }
+              else
+                var = QVariant(value);
+              break;
+            }
+            default: // Nothing
+              var = QVariant(QString::null);
+          }
+        }
+        else
+          var = QVariant(value);
+        break;
+      }
+      // Load File from Column location and encode appropriately
+      case CSVMapField::Action_SetColumnFromDataFile:
+      {
+        value = _data->value(_current, fields.at(i).column()-1);
+        filetype = (fields.at(i).fileType());
+
+        if(value.isNull())
+          var = QVariant(QString::null); // Nothing (error)
+        else
+        {
+          _fileName = value;
+          switch (filetype)
+          {
+            case CSVMapField::TYPE_IMAGE:
+            {
+              var = imageLoadAndEncode(_fileName);
+              if (var == false)
+                var = QVariant(QString::null); // Nothing (error)
+              break;
+            }
+            case CSVMapField::TYPE_IMAGEENC:
+            {
+              var = imageLoadAndEncode(_fileName, true);
+              if (var == false)
+                var = QVariant(QString::null); // Nothing (error)
+              break;
+            }
+            case CSVMapField::TYPE_FILE:
+            {
+              var = docLoadAndEncode(_fileName);
+              if (var == false)
+                var = QVariant(QString::null); // Nothing (error)
+              break;
+            }
+            default:
+              var = QVariant(value);
+          }
+        }
+        break;
+      }
+      case CSVMapField::Action_UseEmptyString:
+      {
+        var = QVariant(QString(""));
+        break;
+      }
+      case CSVMapField::Action_UseAlternateValue:
+      {
+        var = QVariant(fields.at(i).valueAlt());
+        break;
+      }
+      case CSVMapField::Action_UseNull:
+      {
+       var = QVariant(QString::null);
+        break;
+      }
+      default:
+        continue;
+    }
+
+    label = ":" + fields.at(i).name();
+    if (fields.at(i).isKey())
+    {
+      if(!wheres.empty())
+        where += " AND ";
+      where += fields.at(i).name() + "=" + label;
+      wheres.insert(label, var);
+    }
+      else 
+    {
+      if(!values.empty())
+        set += ", ";
+      set += fields.at(i).name() + "=" + label;
+      values.insert(label, var);
+    }
+  }
+
+  if(values.empty())
+  {
+    _ignored++;
+    _errMsg = QString("IGNORED Record %1: There are no columns to update").arg(_current+1);
+    _errorList.append(_errMsg);
+    return;
+  }
+
+  query += set + where;
+  QSqlQuery qry;
+  qry.prepare(query);
+  QMap<QString,QVariant>::iterator vit;
+  for(vit = values.begin(); vit != values.end(); ++vit)
+    qry.bindValue(vit.key(), vit.value());
+  for(vit = wheres.begin(); vit != wheres.end(); ++vit)
+    qry.bindValue(vit.key(), vit.value());
+
+  if(!qry.exec())
+  {
+    if(usetransaction) QSqlQuery sprollback("ROLLBACK TO SAVEPOINT csvinsert;");
+    _error++;
+    _errMsg = QString("ERROR Record %1: %2").arg(_current+1).arg(qry.lastError().text());
+    _errorList.append(_errMsg);
+  }
+}
+
+QVariant CSVToolWindow::imageLoadAndEncode(QString fileName, bool enc)
+{
+  QImageWriter imageIo;
+  QBuffer  imageBuffer;
+  QString  imageString;
+
+  if (fileName.length() > 1)
+  {
+    if(!__image.load(fileName))
+    {
+       QMessageBox::warning(this, tr("Could not load file"),
+                   tr( "Could not load file %1.\n"
+                       "The file is not an image, an unknown image format or is corrupt" ).arg(fileName) );
+       return false;
+    }
+  }
+
+  if (__image.isNull())
+  {
+    QMessageBox::warning(this, tr("No Image Specified"),
+               tr("You must load an image before you may save this record.") );
+    return false;
+  }
+
+  imageBuffer.open(QIODevice::ReadWrite);
+  imageIo.setDevice(&imageBuffer);
+  imageIo.setFormat("PNG");
+
+  if (!imageIo.write(__image))
+  {
+    QMessageBox::critical(this, tr("Error Saving Image"),
+               tr("There was an error trying to save the image (%1).").arg(fileName) );
+    return false;
+  }
+
+  imageBuffer.close();
+  imageString = enc ? QUUEncode(imageBuffer) : imageBuffer.buffer();
+
+  return QVariant(imageString);
+}
+
+QVariant CSVToolWindow::docLoadAndEncode(QString fileName)
+{
+  QByteArray  bytarr;
+  QFileInfo fi(fileName);
+
+  if (!fi.exists())
+  {
+    QMessageBox::warning( this, tr("File Error"),
+       tr("File %1 was not found and will not be saved.").arg(fileName));
+    return false;
+  }
+
+  QFile sourceFile(fileName);
+  if (!sourceFile.open(QIODevice::ReadOnly))
+  {
+    QMessageBox::warning( this, tr("File Open Error"),
+             tr("Could not open source file %1 for read.")
+                        .arg(fileName));
+    return false;
+  }
+  bytarr = sourceFile.readAll();
+  return QVariant(bytarr);
 }
 
 void CSVToolWindow::sImportViewLog()
