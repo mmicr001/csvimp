@@ -391,6 +391,7 @@ bool CSVToolWindow::importStart()
 
   map = atlas->map(mapname);
   map.simplify();
+
   QList<CSVMapField> fields = map.fields();
 
   if (map.name() != mapname || fields.isEmpty())
@@ -728,6 +729,14 @@ void CSVToolWindow::insertAction( bool append )
     return;
   }
 
+  if(append && wheres.empty())
+  {
+    if(usetransaction) QSqlQuery sprollback("ROLLBACK TO SAVEPOINT csvinsert;");
+    _error++;
+    _errMsg = QString("No Key defined in Altas Map.");
+    _errorList.append(_errMsg);
+  }
+
   front += ") ";
   back += append ? " " : ")";
   query += front + back;
@@ -905,6 +914,14 @@ void CSVToolWindow::updateAction()
     _errMsg = QString("IGNORED Record %1: There are no columns to update").arg(_current+1);
     _errorList.append(_errMsg);
     return;
+  }
+
+  if(wheres.empty())
+  {
+    if(usetransaction) QSqlQuery sprollback("ROLLBACK TO SAVEPOINT csvinsert;");
+    _error++;
+    _errMsg = QString("No Key defined in Altas Map.");
+    _errorList.append(_errMsg);
   }
 
   query += set + where;

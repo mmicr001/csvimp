@@ -3,6 +3,10 @@
   <qresource>
     <file>images/splashCSVimp.png</file>
     <file>images/CSVimpIcon-32x32.png</file>
+    <file>images/new.png</file>
+    <file>images/save.png</file>
+    <file>images/opendb.png</file>
+    <file>images/openfile.png</file>
   </qresource>
 </RCC>
 

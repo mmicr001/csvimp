@@ -110,17 +110,27 @@ QString CSVImpPlugin::lastError()
   return msg;
 }
 
-bool CSVImpPlugin::openAtlas(QString filename)
+bool CSVImpPlugin::openAtlas(QString filename, bool useDb)
 {
-  if (DEBUG) qDebug("CSVImpPlugin::openAtlas(%s)", qPrintable(filename));
+  if (DEBUG) qDebug("CSVImpPlugin::openAtlas(%s, %s)", qPrintable(filename), qPrintable(QString::number(useDb)));
 
   CSVAtlasWindow *atlaswind = qobject_cast<CSVAtlasWindow*>(getCSVAtlasWindow(qobject_cast<QWidget*>(parent())));
   if (atlaswind)
   {
-    atlaswind->fileOpen(filename);
-    if (DEBUG)
-      qDebug("CSVImpPlugin::openAtlas() opened [%s]", qPrintable(filename));
-    return true;
+    if (useDb)
+    {
+      atlaswind->dbOpen(filename);
+      if (DEBUG)
+        qDebug("CSVImpPlugin::openAtlas() opened from database [%s]", qPrintable(filename));
+      return true;
+    }
+    else
+    {
+      atlaswind->fileOpen(filename);
+      if (DEBUG)
+        qDebug("CSVImpPlugin::openAtlas() opened [%s]", qPrintable(filename));
+      return true;
+    }
   }
 
   return false;
@@ -149,6 +159,8 @@ void CSVImpPlugin::setAtlasDir(QString dirname)
 
 bool CSVImpPlugin::setAtlasMap(const QString mapname)
 {
+  if (DEBUG) qDebug("CSVImpPlugin::setAltasMap(%s)", qPrintable(mapname));
+
   if (_csvtoolwindow && _csvtoolwindow->atlasWindow())
     return _csvtoolwindow->atlasWindow()->setMap(mapname);
 

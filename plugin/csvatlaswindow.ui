@@ -18,6 +18,39 @@
     <item>
      <layout class="QHBoxLayout">
       <item>
+       <widget class="QLabel" name="_atlasNameLit">
+        <property name="text">
+         <string>Atlas Name:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="_atlasName" />
+      </item>
+      <item>
+       <spacer name="_spacer1">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout">
+      <item>
        <widget class="QLabel" name="_lblMap">
         <property name="text">
          <string>Map:</string>
@@ -321,6 +354,7 @@
    </attribute>
    <addaction name="fileNewAction"/>
    <addaction name="fileOpenAction"/>
+   <addaction name="dbOpenAction"/>
    <addaction name="fileSaveAction"/>
   </widget>
   <widget class="QMenuBar" name="MenuBar">
@@ -345,6 +379,14 @@
     <addaction name="separator"/>
     <addaction name="fileExitAction"/>
    </widget>
+   <widget class="QMenu" name="databaseMenu">
+    <property name="title">
+     <string>&amp;Database</string>
+    </property>
+    <addaction name="dbOpenAction"/>
+    <addaction name="dbSaveAction" />
+    <addaction name="dbDeleteAction" />
+   </widget>
    <widget class="QMenu" name="helpMenu">
     <property name="title">
      <string>&amp;Help</string>
@@ -355,12 +397,13 @@
     <addaction name="helpAboutAction"/>
    </widget>
    <addaction name="fileMenu"/>
+   <addaction name="databaseMenu"/>
    <addaction name="helpMenu"/>
   </widget>
   <action name="fileNewAction">
    <property name="icon">
     <iconset>
-     <normaloff>image1</normaloff>image1</iconset>
+     <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
    </property>
    <property name="text">
     <string>&amp;New</string>
@@ -378,7 +421,7 @@
   <action name="fileOpenAction">
    <property name="icon">
     <iconset>
-     <normaloff>image2</normaloff>image2</iconset>
+     <normaloff>:/images/openfile.png</normaloff>:/images/openfile.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open...</string>
@@ -393,10 +436,28 @@
     <cstring>fileOpenAction</cstring>
    </property>
   </action>
+  <action name="dbOpenAction">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/opendb.png</normaloff>:/images/opendb.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open from Database</string>
+   </property>
+   <property name="iconText">
+    <string>Open Database</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+   <property name="name" stdset="0">
+    <cstring>dbOpenAction</cstring>
+   </property>
+  </action>
   <action name="fileSaveAction">
    <property name="icon">
     <iconset>
-     <normaloff>image3</normaloff>image3</iconset>
+     <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save</string>
@@ -407,8 +468,35 @@
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
+  </action>
+  <action name="dbSaveAction">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save to &amp;Database</string>
+   </property>
+   <property name="iconText">
+    <string>Save</string>
+   </property>
    <property name="name" stdset="0">
-    <cstring>fileSaveAction</cstring>
+    <cstring>dbSaveAction</cstring>
+   </property>
+  </action>
+  <action name="dbDeleteAction">
+   <property name="icon">
+    <iconset>
+     <normaloff>image3</normaloff>image3</iconset>
+   </property>
+   <property name="text">
+    <string>Delete &amp;from Database</string>
+   </property>
+   <property name="iconText">
+    <string>Delete</string>
+   </property>
+   <property name="name" stdset="0">
+    <cstring>dbDeleteAction</cstring>
    </property>
   </action>
   <action name="fileSaveAsAction">
@@ -550,6 +638,22 @@
    </hints>
   </connection>
   <connection>
+   <sender>dbOpenAction</sender>
+   <signal>triggered()</signal>
+   <receiver>CSVAtlasWindow</receiver>
+   <slot>dbOpen()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>fileSaveAction</sender>
    <signal>triggered()</signal>
    <receiver>CSVAtlasWindow</receiver>
@@ -570,6 +674,38 @@
    <signal>triggered()</signal>
    <receiver>CSVAtlasWindow</receiver>
    <slot>fileSaveAs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dbSaveAction</sender>
+   <signal>triggered()</signal>
+   <receiver>CSVAtlasWindow</receiver>
+   <slot>dbSave()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dbDeleteAction</sender>
+   <signal>triggered()</signal>
+   <receiver>CSVAtlasWindow</receiver>
+   <slot>dbDelete()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
