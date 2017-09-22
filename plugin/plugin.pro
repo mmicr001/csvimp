@@ -47,6 +47,7 @@ win32-msvc* {
 
 FORMS    = csvaddmapinputdialog.ui \
            csvatlaswindow.ui    \
+           csvatlaslist.ui      \
            csvimportprogress.ui \
            csvtoolwindow.ui     \
            logwindow.ui         \
@@ -56,6 +57,7 @@ HEADERS  = batchmessagehandler.h        \
            csvaddmapinputdialog.h       \
            csvimpplugin.h               \
            csvatlas.h                   \
+           csvatlaslist.h               \
            csvatlaswindow.h             \
            csvdata.h                    \
            csvmap.h                     \
@@ -72,6 +74,7 @@ SOURCES  = batchmessagehandler.cpp      \
            csvaddmapinputdialog.cpp     \
            csvimpplugin.cpp     \
            csvatlas.cpp         \
+           csvatlaslist.cpp     \
            csvatlaswindow.cpp   \
            csvdata.cpp          \
            csvmap.cpp           \

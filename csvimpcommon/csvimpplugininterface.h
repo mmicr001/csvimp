@@ -23,7 +23,7 @@ class CSVImpPluginInterface
     virtual bool    importCSV()      = 0;
     virtual bool    isInteractive()  = 0;
     virtual QString lastError()      = 0;
-    virtual bool    openAtlas(QString filename = QString()) = 0;
+    virtual bool    openAtlas(QString filename = QString(), bool useDb = false) = 0;
     virtual bool    openCSV(QString filename = QString())   = 0;
     virtual void    setAtlasDir(QString dirname)            = 0;
     virtual bool    setAtlasMap(const QString dirname)      = 0;

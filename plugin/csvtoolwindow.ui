@@ -209,7 +209,7 @@
   <action name="fileNewAction">
    <property name="icon">
     <iconset>
-     <normaloff>image0</normaloff>image0</iconset>
+     <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
    </property>
    <property name="text">
     <string>&amp;New</string>
@@ -227,7 +227,7 @@
   <action name="fileOpenAction">
    <property name="icon">
     <iconset>
-     <normaloff>image1</normaloff>image1</iconset>
+     <normaloff>:/images/openfile.png</normaloff>:/images/openfile.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open CSV...</string>
@@ -248,7 +248,7 @@
   <action name="fileSaveAction">
    <property name="icon">
     <iconset>
-     <normaloff>image2</normaloff>image2</iconset>
+     <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save</string>
