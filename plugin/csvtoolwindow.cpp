@@ -18,6 +18,7 @@
 #include <QList>
 #include <QMap>
 #include <QMessageBox>
+#include <QMimeDatabase>
 #include <QPixmap>
 #include <QtGlobal>
 #if QT_VERSION >= 0x050000
@@ -576,6 +577,8 @@ void CSVToolWindow::insertAction( bool append )
   QString label;
   QVariant var;
   QString  _fileName;
+  QMimeDatabase mimedb;
+  QString mimetype;
   CSVMapField::FileType filetype;
 
   query = QString("INSERT INTO %1 ").arg(map.table());
@@ -676,6 +679,8 @@ void CSVToolWindow::insertAction( bool append )
               var = docLoadAndEncode(_fileName);
               if (var == false)
                 var = QVariant(QString::null); // Nothing (error)
+              else
+                mimetype = mimedb.mimeTypeForFile(QFileInfo(_fileName)).name();
               break;
             }
             default:
@@ -712,6 +717,19 @@ void CSVToolWindow::insertAction( bool append )
     values.insert(label, var);
     front += fields.at(i).name();
     back  += label;
+
+    if (!mimetype.isEmpty())
+    {
+      if(!values.empty())
+      {
+        front += ", ";
+        back  += ", ";
+      }
+      values.insert(":file_mime_type", mimetype);
+      front += "file_mime_type";
+      back  += ":file_mime_type";
+    }
+
     if (append && fields.at(i).isKey())
     {
       if(!wheres.empty())
@@ -766,6 +784,8 @@ void CSVToolWindow::updateAction()
   QString label;
   QVariant var;
   QString  _fileName;
+  QMimeDatabase mimedb;
+  QString mimetype;
   CSVMapField::FileType filetype;
 
   query = QString("UPDATE %1 SET ").arg(map.table());
@@ -864,6 +884,8 @@ void CSVToolWindow::updateAction()
               var = docLoadAndEncode(_fileName);
               if (var == false)
                 var = QVariant(QString::null); // Nothing (error)
+              else
+                mimetype = mimedb.mimeTypeForFile(QFileInfo(_fileName)).name();
               break;
             }
             default:
@@ -905,6 +927,14 @@ void CSVToolWindow::updateAction()
         set += ", ";
       set += fields.at(i).name() + "=" + label;
       values.insert(label, var);
+
+      if (!mimetype.isEmpty())
+      {
+        if(!values.empty())
+          set += ", ";
+        set += "file_mime_type=:file_mime_type";
+        values.insert(":file_mime_type", mimetype);
+      }
     }
   }
 
