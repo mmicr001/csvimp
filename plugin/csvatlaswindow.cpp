@@ -332,7 +332,7 @@ QString CSVAtlasWindow::map() const
   return _map->currentText();
 }
 
-XAbstractMessageHandler *CSVAtlasWindow::messageHandler() const
+YAbstractMessageHandler *CSVAtlasWindow::messageHandler() const
 {
   return _msghandler;
 }
@@ -356,7 +356,7 @@ bool CSVAtlasWindow::setMap(const QString mapname)
   return (mapidx >= 0);
 }
 
-void CSVAtlasWindow::setMessageHandler(XAbstractMessageHandler *handler)
+void CSVAtlasWindow::setMessageHandler(YAbstractMessageHandler *handler)
 {
   if (handler != _msghandler)
     _msghandler = handler;

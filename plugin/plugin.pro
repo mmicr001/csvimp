@@ -66,7 +66,7 @@ HEADERS  = batchmessagehandler.h        \
            logwindow.h                  \
            missingfield.h               \
            rowcontroller.h              \
-           xabstractmessagehandler.h    \
+           yabstractmessagehandler.h    \
            ../csvimpcommon/csvimpdata.h \
            ../csvimpcommon/csvimpplugininterface.h \
 
@@ -83,7 +83,7 @@ SOURCES  = batchmessagehandler.cpp      \
            logwindow.cpp        \
            missingfield.cpp     \
            rowcontroller.cpp    \
-           xabstractmessagehandler.cpp    \
+           yabstractmessagehandler.cpp    \
            ../csvimpcommon/csvimpdata.cpp \
 
 RESOURCES += ../csvimpcommon/csvimp.qrc

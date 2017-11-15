@@ -18,7 +18,7 @@ class CSVAtlasWindow;
 class CSVData;
 class QTimerEvent;
 class LogWindow;
-class XAbstractMessageHandler;
+class YAbstractMessageHandler;
 
 class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
 {
@@ -29,8 +29,8 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     ~CSVToolWindow();
     CSVAtlasWindow *atlasWindow();
 
-    XAbstractMessageHandler *messageHandler() const;
-    void                     setMessageHandler(XAbstractMessageHandler *handler);
+    YAbstractMessageHandler *messageHandler() const;
+    void                     setMessageHandler(YAbstractMessageHandler *handler);
 
   public slots:
     void clearImportLog();
@@ -65,7 +65,7 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     CSVData        *_data;
     int             _dbTimerId;
     LogWindow      *_log;
-    XAbstractMessageHandler *_msghandler;
+    YAbstractMessageHandler *_msghandler;
     void populate();
 
   private:

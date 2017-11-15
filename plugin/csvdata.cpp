@@ -326,12 +326,12 @@ bool CSVData::load(QString filename, QWidget *parent)
   return result;
 }
 
-XAbstractMessageHandler *CSVData::messageHandler() const
+YAbstractMessageHandler *CSVData::messageHandler() const
 {
   return _msghandler;
 }
 
-void CSVData::setMessageHandler(XAbstractMessageHandler *handler)
+void CSVData::setMessageHandler(YAbstractMessageHandler *handler)
 {
   _msghandler = handler;
 }

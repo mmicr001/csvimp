@@ -11,7 +11,7 @@
 #include "batchmessagehandler.h"
 
 BatchMessageHandler::BatchMessageHandler(QObject *parent)
-  : XAbstractMessageHandler(parent)
+  : YAbstractMessageHandler(parent)
 {
 }
 

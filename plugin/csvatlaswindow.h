@@ -14,7 +14,7 @@
 #include "ui_csvatlaswindow.h"
 
 class CSVAtlas;
-class XAbstractMessageHandler;
+class YAbstractMessageHandler;
 
 class CSVAtlasWindow : public QMainWindow, public Ui::CSVAtlasWindow
 {
@@ -41,14 +41,14 @@ class CSVAtlasWindow : public QMainWindow, public Ui::CSVAtlasWindow
     virtual void        helpContents();
     virtual void        helpIndex();
     virtual QString     map()                         const;
-    virtual XAbstractMessageHandler *messageHandler() const;
+    virtual YAbstractMessageHandler *messageHandler() const;
     virtual void        sAddMap();
     virtual void        sDeleteMap();
     virtual void        sMapChanged( int );
     virtual void        sRenameMap();
     virtual void        setDir(QString dirname);
     virtual bool        setMap(const QString mapname);
-    virtual void        setMessageHandler(XAbstractMessageHandler *handler);
+    virtual void        setMessageHandler(YAbstractMessageHandler *handler);
 
   signals:
     void delimiterChanged(QString);
@@ -60,7 +60,7 @@ class CSVAtlasWindow : public QMainWindow, public Ui::CSVAtlasWindow
     CSVAtlas                 *_atlas;
     QString                  _currentDir;
     QString                  _filename;
-    XAbstractMessageHandler *_msghandler;
+    YAbstractMessageHandler *_msghandler;
     QString                  _selectedMap;
 };
 

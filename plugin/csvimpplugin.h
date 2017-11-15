@@ -50,7 +50,7 @@ class CSVImpPlugin : public QObject, public CSVImpPluginInterface
     QString         _csvdir;
     CSVToolWindow  *_csvtoolwindow;
     bool            _firstLineIsHeader;
-    XAbstractMessageHandler *_msghandler;
+    YAbstractMessageHandler *_msghandler;
 };
 
 #endif
