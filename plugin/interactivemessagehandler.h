@@ -11,9 +11,9 @@
 #ifndef INTERACTIVEMESSAGEHANDLER_H
 #define INTERACTIVEMESSAGEHANDLER_H
 
-#include "xabstractmessagehandler.h"
+#include "yabstractmessagehandler.h"
 
-class InteractiveMessageHandler : public XAbstractMessageHandler
+class InteractiveMessageHandler : public YAbstractMessageHandler
 {
   Q_OBJECT
     

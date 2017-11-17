@@ -13,7 +13,7 @@
 #include <QMessageBox>
 
 InteractiveMessageHandler::InteractiveMessageHandler(QObject *parent)
-  : XAbstractMessageHandler(parent)
+  : YAbstractMessageHandler(parent)
 {
 }
 

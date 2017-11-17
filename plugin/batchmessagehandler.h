@@ -11,9 +11,9 @@
 #ifndef BATCHMESSAGEHANDLER_H
 #define BATCHMESSAGEHANDLER_H
 
-#include "xabstractmessagehandler.h"
+#include "yabstractmessagehandler.h"
 
-class BatchMessageHandler : public XAbstractMessageHandler
+class BatchMessageHandler : public YAbstractMessageHandler
 {
   Q_OBJECT
     

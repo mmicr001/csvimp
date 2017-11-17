@@ -294,7 +294,7 @@ void CSVToolWindow::mapEdit()
   _atlasWindow->show();
 }
 
-XAbstractMessageHandler *CSVToolWindow::messageHandler() const
+YAbstractMessageHandler *CSVToolWindow::messageHandler() const
 {
   return _msghandler;
 }
@@ -521,7 +521,7 @@ bool CSVToolWindow::importStart()
     _log->show();
     _log->raise();
     if (_msghandler &&  // log messages there's a non-interactive message handler
-        qobject_cast<XAbstractMessageHandler*>(_msghandler) &&
+        qobject_cast<YAbstractMessageHandler*>(_msghandler) &&
         ! qobject_cast<InteractiveMessageHandler*>(_msghandler))
       _msghandler->message(_error ? QtCriticalMsg : QtWarningMsg,
                            tr("Import Processing Status"),
@@ -1049,7 +1049,7 @@ void CSVToolWindow::setDir(QString dirname)
   _currentDir = dirname;
 }
 
-void CSVToolWindow::setMessageHandler(XAbstractMessageHandler *handler)
+void CSVToolWindow::setMessageHandler(YAbstractMessageHandler *handler)
 {
   if (handler != _msghandler)
   {
