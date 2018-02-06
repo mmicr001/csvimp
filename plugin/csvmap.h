@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -40,7 +40,8 @@ class CSVMapField
       Action_UseColumn,
       Action_UseEmptyString,
       Action_UseAlternateValue,
-      Action_UseNull
+      Action_UseNull,
+      Action_SetColumnFromDataFile
     };
     void setAction(Action);
     Action action() const { return _action; }
@@ -56,6 +57,16 @@ class CSVMapField
     IfNull ifNullAction() const { return _ifNullAction; }
     void setIfNullActionAlt(IfNull);
     IfNull ifNullActionAlt() const { return _ifNullActionAlt; }
+
+    enum FileType {
+      TYPE_NA,
+      TYPE_FILE,
+      TYPE_IMAGEENC,
+      TYPE_IMAGE,
+      TYPE_URL
+    };
+    void setFileType(FileType);
+    FileType fileType() const { return _fileType; }
 
     void setColumn(unsigned int);
     unsigned int column() const { return _column; }
@@ -76,13 +87,17 @@ class CSVMapField
 
     static QString actionToName(Action);
     static Action nameToAction(const QString &);
+    static QString fileTypeToName(FileType);
+    static FileType nameToFileType(const QString &);
     static QStringList actionList();
+    static QStringList fileList();
 
   private:
     QString _name;
     bool    _isKey;
     QVariant::Type _type;
     Action _action;
+    FileType _fileType;
     unsigned int _column;
     IfNull  _ifNullAction;
     unsigned int _columnAlt;
@@ -142,7 +157,7 @@ class CSVMap
     QString _sqlPost;
     QString _name;
     QString _table;
-    Action _action;
+    Action  _action;
     QString _description;
     QString _delimiter;
 };
