@@ -1,32 +1,32 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
  * to be bound by its terms.
  */
 
-#include <xabstractmessagehandler.h>
+#include <yabstractmessagehandler.h>
 
-XAbstractMessageHandler::XAbstractMessageHandler(QObject *parent)
+YAbstractMessageHandler::YAbstractMessageHandler(QObject *parent)
   : QAbstractMessageHandler(parent)
 {
 }
 
-XAbstractMessageHandler::~XAbstractMessageHandler()
+YAbstractMessageHandler::~YAbstractMessageHandler()
 {
 }
 
-void XAbstractMessageHandler::message(QtMsgType type, const QString &description, const QUrl &identifier, const QSourceLocation &sourceLocation)
+void YAbstractMessageHandler::message(QtMsgType type, const QString &description, const QUrl &identifier, const QSourceLocation &sourceLocation)
 {
   QMutexLocker locker(&_mutex);
   _unhandledMessage.append(QPair<QtMsgType, QString>(type, description));
   handleMessage(type, description, identifier, sourceLocation);
 }
 
-void XAbstractMessageHandler::message(QtMsgType type, const QString title, const QString &description, const QUrl &identifier, const QSourceLocation &sourceLocation)
+void YAbstractMessageHandler::message(QtMsgType type, const QString title, const QString &description, const QUrl &identifier, const QSourceLocation &sourceLocation)
 {
   QMutexLocker locker(&_mutex);
   _unhandledMessage.append(QPair<QtMsgType, QString>(type, description));
@@ -35,7 +35,7 @@ void XAbstractMessageHandler::message(QtMsgType type, const QString title, const
 
 // drains the queue but only returns those messages of the given type or greater
 // on return, type holds the value of the greatest QtMsgType found
-QStringList XAbstractMessageHandler::unhandledMessages(QtMsgType *type)
+QStringList YAbstractMessageHandler::unhandledMessages(QtMsgType *type)
 {
   QStringList unhandled;
   QtMsgType   dummy = QtDebugMsg;

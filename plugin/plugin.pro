@@ -1,7 +1,7 @@
 #
 # This file is part of the xTuple ERP: PostBooks Edition, a free and
 # open source Enterprise Resource Planning software suite,
-# Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+# Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
 # It is licensed to you under the Common Public Attribution License
 # version 1.0, the full text of which (including xTuple-specific Exhibits)
 # is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -47,6 +47,7 @@ win32-msvc* {
 
 FORMS    = csvaddmapinputdialog.ui \
            csvatlaswindow.ui    \
+           csvatlaslist.ui      \
            csvimportprogress.ui \
            csvtoolwindow.ui     \
            logwindow.ui         \
@@ -56,6 +57,7 @@ HEADERS  = batchmessagehandler.h        \
            csvaddmapinputdialog.h       \
            csvimpplugin.h               \
            csvatlas.h                   \
+           csvatlaslist.h               \
            csvatlaswindow.h             \
            csvdata.h                    \
            csvmap.h                     \
@@ -64,7 +66,7 @@ HEADERS  = batchmessagehandler.h        \
            logwindow.h                  \
            missingfield.h               \
            rowcontroller.h              \
-           xabstractmessagehandler.h    \
+           yabstractmessagehandler.h    \
            ../csvimpcommon/csvimpdata.h \
            ../csvimpcommon/csvimpplugininterface.h \
 
@@ -72,6 +74,7 @@ SOURCES  = batchmessagehandler.cpp      \
            csvaddmapinputdialog.cpp     \
            csvimpplugin.cpp     \
            csvatlas.cpp         \
+           csvatlaslist.cpp     \
            csvatlaswindow.cpp   \
            csvdata.cpp          \
            csvmap.cpp           \
@@ -80,7 +83,7 @@ SOURCES  = batchmessagehandler.cpp      \
            logwindow.cpp        \
            missingfield.cpp     \
            rowcontroller.cpp    \
-           xabstractmessagehandler.cpp    \
+           yabstractmessagehandler.cpp    \
            ../csvimpcommon/csvimpdata.cpp \
 
 RESOURCES += ../csvimpcommon/csvimp.qrc

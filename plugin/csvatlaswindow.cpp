@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -20,6 +20,7 @@
 #include <QSqlField>
 #include <QSqlIndex>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QSqlRecord>
 #include <QTextStream>
 
@@ -27,6 +28,7 @@
 
 #include "csvaddmapinputdialog.h"
 #include "csvatlas.h"
+#include "csvatlaslist.h"
 #include "csvimpdata.h"
 #include "interactivemessagehandler.h"
 #include "missingfield.h"
@@ -122,6 +124,7 @@ void CSVAtlasWindow::fileOpen(QString filename)
     sMapChanged(0);
     _filename = filename;
     _currentDir = QFileInfo(_filename).absoluteDir().absolutePath();
+    _atlasName->setText(_atlas->description());
   }
   else
     _msghandler->message(QtWarningMsg, tr("Error Reading File"),
@@ -135,6 +138,76 @@ void CSVAtlasWindow::fileOpen(QString filename)
     _atlas = new CSVAtlas();
 }
 
+void CSVAtlasWindow::dbOpen(QString filename)
+{
+  QSqlQuery atl;
+  QString dbMap = QString::null;
+  QDomDocument doc = QDomDocument();
+  QString errMsg;
+  int errLine, errCol;
+
+  if (DEBUG)
+    qDebug("CSVAtlasWindow::dbOpen(%s) entered with old Db _filename [%s]",
+           qPrintable(filename), qPrintable(_filename));
+
+  if (! filename.isEmpty())
+    dbMap = filename;
+  else
+  {
+    CSVAtlasList atlasdlg(this);
+    if (atlasdlg.exec() != QDialog::Accepted)
+      return;
+
+    dbMap = atlasdlg.selectedAtlas();
+  }
+
+  atl.prepare("SELECT atlas_atlasmap FROM atlas WHERE atlas_name=:atlasname;");
+  atl.bindValue(":atlasname", dbMap);
+  atl.exec();
+  if (atl.first())
+  {
+    _map->clear();
+    sMapChanged(0);
+    if(_atlas)
+    {
+      delete _atlas;
+      _atlas = 0;
+    }
+
+    if(doc.setContent(atl.value("atlas_atlasmap").toString(), &errMsg, &errLine, &errCol))
+    {
+      _atlas = new CSVAtlas(doc.documentElement());
+      _map->addItems(_atlas->mapList());
+      sMapChanged(0);
+      _atlasName->setText(_atlas->description());
+    }
+    else
+      _msghandler->message(QtWarningMsg, tr("Error Reading Database"),
+                           tr("<p>An error was encountered while trying to read "
+                              "the Atlas %1 from the Database: %2").arg(dbMap, errMsg));
+  }
+
+  if(!_atlas)
+    _atlas = new CSVAtlas();
+}
+
+void CSVAtlasWindow::dbDelete()
+{
+  QSqlQuery delq;
+
+  delq.prepare("DELETE FROM atlas WHERE atlas_name=:atlasname;");
+  delq.bindValue(":atlasname", _atlas->description());
+  delq.exec();
+  if(delq.lastError().type() != QSqlError::NoError)
+  {
+      _msghandler->message(QtWarningMsg, tr("Error Deleting Atlas"),
+                         tr("<p>Could not delete the Atlas from the Database"));
+      return;
+  }
+
+  _atlas = new CSVAtlas();
+}
+
 void CSVAtlasWindow::fileSave()
 {
   if(_filename.isEmpty())
@@ -143,9 +216,20 @@ void CSVAtlasWindow::fileSave()
     if(_filename.isEmpty())
       return;
   }
+
+  if (tr("Update") == _action->currentText() || tr("Append") == _action->currentText())
+  {
+    if (!hasKey())
+    {
+      _msghandler->message(QtWarningMsg, tr("You must specify Key field(s) with action Update/Append"));
+      return;
+    }
+  }
+
   sMapChanged(_map->currentIndex());
 
   QDomDocument doc = QDomDocument("openCSVAtlasDef");
+  _atlas->setDescription(_atlasName->text());
   doc.appendChild(_atlas->createElement(doc));
 
   QFile file(_filename);
@@ -172,6 +256,51 @@ void CSVAtlasWindow::fileSaveAs()
   _filename = filename;
   _currentDir = QFileInfo(_filename).absoluteDir().absolutePath();
   fileSave();
+}
+
+void CSVAtlasWindow::dbSave()
+{
+  if(_atlasName->text().trimmed().length() == 0)
+  {
+    _msghandler->message(QtWarningMsg, tr("Please enter a name for the Atlas"));
+    return;
+  }
+
+  if (tr("Update") == _action->currentText() || tr("Append") == _action->currentText())
+  {
+    if (!hasKey())
+    {
+      _msghandler->message(QtWarningMsg, tr("You must specify Key field(s) with action Update/Append"));
+      return;
+    }
+  }
+
+  sMapChanged(_map->currentIndex());
+
+  QDomDocument doc = QDomDocument("openCSVAtlasDef");
+  _atlas->setDescription(_atlasName->text());
+  doc.appendChild(_atlas->createElement(doc));
+
+  QSqlQuery saveatlas;
+  saveatlas.prepare("SELECT EXISTS(SELECT 1 FROM atlas WHERE atlas_name = :atlasname);");
+  saveatlas.bindValue(":atlasname", _atlasName->text().trimmed());
+  saveatlas.exec();
+  if (saveatlas.first())   
+  {
+    if (saveatlas.value("exists").toBool())
+      saveatlas.prepare("UPDATE atlas SET atlas_atlasmap=:atlasmap WHERE atlas_name=:atlasname;");
+    else
+      saveatlas.prepare("INSERT INTO atlas (atlas_name, atlas_atlasmap) VALUES (:atlasname, :atlasmap);");
+    saveatlas.bindValue(":atlasname", _atlasName->text().trimmed());
+    saveatlas.bindValue(":atlasmap", doc.toString());
+    saveatlas.exec();
+    if(saveatlas.lastError().type() != QSqlError::NoError)
+      _msghandler->message(QtWarningMsg, tr("Error Saving Atlas"),
+                         tr("<p>Could not save the Atlas to the Database"));
+  }
+  else
+    _msghandler->message(QtWarningMsg, tr("Error Saving Atlas"),
+                         tr("<p>Could not save the Atlas to the Database"));
 }
 
 void CSVAtlasWindow::filePrint()
@@ -203,7 +332,7 @@ QString CSVAtlasWindow::map() const
   return _map->currentText();
 }
 
-XAbstractMessageHandler *CSVAtlasWindow::messageHandler() const
+YAbstractMessageHandler *CSVAtlasWindow::messageHandler() const
 {
   return _msghandler;
 }
@@ -227,7 +356,7 @@ bool CSVAtlasWindow::setMap(const QString mapname)
   return (mapidx >= 0);
 }
 
-void CSVAtlasWindow::setMessageHandler(XAbstractMessageHandler *handler)
+void CSVAtlasWindow::setMessageHandler(YAbstractMessageHandler *handler)
 {
   if (handler != _msghandler)
     _msghandler = handler;
@@ -361,6 +490,12 @@ void CSVAtlasWindow::sMapChanged( int )
         field.setIfNullActionAlt(CSVMapField::Nothing);
 
       field.setValueAlt(_fields->item(r, 9)->data(Qt::EditRole).toString());
+
+      if (qobject_cast<QComboBox*>(_fields->cellWidget(r, 10)))
+        field.setFileType(CSVMapField::nameToFileType(qobject_cast<QComboBox*>(_fields->cellWidget(r, 10))->currentText()));
+      else
+        field.setFileType(CSVMapField::TYPE_IMAGEENC);
+
       map.setField(field);
     }
     map.simplify();
@@ -498,6 +633,13 @@ void CSVAtlasWindow::sMapChanged( int )
 
         _fields->setItem(row, 9, new QTableWidgetItem(mf.valueAlt()));
 
+        QComboBox *filetypecombo = new QComboBox(_fields);
+        filetypecombo->addItems(CSVMapField::fileList());
+        if (! mf.isEmpty())
+          filetypecombo->setCurrentIndex(mf.fileType());
+        _fields->setCellWidget(row, 10, filetypecombo);
+
+
         RowController *control = new RowController(_fields, row, colspinner);
         control->setAction(actcombo);
         control->setColumn(colspinner);
@@ -505,6 +647,7 @@ void CSVAtlasWindow::sMapChanged( int )
         control->setAltColumn(altspinner);
         control->setAltIfNull(altnullcombo);
         control->setAltValue(_fields->item(row, 9));
+        control->setFileType(filetypecombo);
         control->finishSetup();
       }
     }
@@ -518,6 +661,17 @@ void CSVAtlasWindow::sMapChanged( int )
   else
     _msghandler->message(QtCriticalMsg, tr("No Database"),
                          tr("Could not get the database connection."));
+}
+
+bool CSVAtlasWindow::hasKey()
+{
+  for(int r = 0; r < _fields->rowCount(); r++)
+  {
+    bool _hasKey =qobject_cast<QCheckBox*>(_fields->cellWidget(r,0))->isChecked();
+    if (_hasKey)
+      return true;
+  }
+  return false;
 }
 
 void CSVAtlasWindow::closeEvent( QCloseEvent * e)

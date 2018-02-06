@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -17,7 +17,7 @@
 
 class CSVDataPrivate;
 class QWidget;
-class XAbstractMessageHandler;
+class YAbstractMessageHandler;
 
 class CSVData : public QObject
 {
@@ -34,10 +34,10 @@ class CSVData : public QObject
     bool                     firstRowHeaders() const;
     QString                  header(int);
     bool                     load(QString filename, QWidget *parent = 0);
-    XAbstractMessageHandler *messageHandler()  const;
+    YAbstractMessageHandler *messageHandler()  const;
     void         setDelimiter(const QChar delim);
     void         setFirstRowHeaders(bool y);
-    void         setMessageHandler(XAbstractMessageHandler *handler);
+    void         setMessageHandler(YAbstractMessageHandler *handler);
     unsigned int rows();
     QString      value(int row, int column);
 
@@ -45,7 +45,7 @@ class CSVData : public QObject
     CSVDataPrivate          *_data;
     QChar                    _delimiter;
     bool                     _firstRowHeaders;
-    XAbstractMessageHandler *_msghandler;
+    YAbstractMessageHandler *_msghandler;
 };
 
 #endif

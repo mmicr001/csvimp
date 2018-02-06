@@ -1,27 +1,31 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
  * to be bound by its terms.
  */
 
-#ifndef XABSTRACTMESSAGEHANDLER_H
-#define XABSTRACTMESSAGEHANDLER_H
+#ifndef YABSTRACTMESSAGEHANDLER_H
+#define YABSTRACTMESSAGEHANDLER_H
 
 #include <QAbstractMessageHandler>
 #include <QMutex>
 #include <QStringList>
 
-class XAbstractMessageHandler : public QAbstractMessageHandler
+// This class is named YAbstractMessageHandler because there is now an XAbstractMessageHandler in
+// qt-client, and having both can cause crashes. Long term solution is to merge the two and put
+// them in a new common submodule to replace a lot of the things in openrpt and qt-client
+// common dirs. Temporary solution is this renaming.
+class YAbstractMessageHandler : public QAbstractMessageHandler
 {
   Q_OBJECT
     
   public:
-    XAbstractMessageHandler(QObject *parent = 0);
-    virtual ~XAbstractMessageHandler();
+    YAbstractMessageHandler(QObject *parent = 0);
+    virtual ~YAbstractMessageHandler();
 
     virtual void    message(QtMsgType type, const QString &description, const QUrl &identifier = QUrl(), const QSourceLocation &sourceLocation = QSourceLocation());
     virtual void    message(QtMsgType type, const QString title, const QString &description, const QUrl &identifier = QUrl(), const QSourceLocation &sourceLocation = QSourceLocation());

@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -23,7 +23,7 @@ class CSVImpPluginInterface
     virtual bool    importCSV()      = 0;
     virtual bool    isInteractive()  = 0;
     virtual QString lastError()      = 0;
-    virtual bool    openAtlas(QString filename = QString()) = 0;
+    virtual bool    openAtlas(QString filename = QString(), bool useDb = false) = 0;
     virtual bool    openCSV(QString filename = QString())   = 0;
     virtual void    setAtlasDir(QString dirname)            = 0;
     virtual bool    setAtlasMap(const QString dirname)      = 0;

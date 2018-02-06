@@ -8,17 +8,29 @@
  * to be bound by its terms.
  */
 
-#ifndef __CSVTOOLS_DATA_H__
-#define __CSVTOOLS_DATA_H__
+#ifndef __CSVATLASLIST_H__
+#define __CSVATLASLIST_H__
 
 #include <QString>
 
-class CSVImp {
+#include "ui_csvatlaslist.h"
+
+class CSVAtlasList : public QDialog, Ui::CSVAtlasList
+{
+  Q_OBJECT
+
   public:
-    static QString build;
-    static QString name;
-    static QString copyright;
-    static QString version;
+    CSVAtlasList(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    virtual ~CSVAtlasList();
+ 
+    virtual QString selectedAtlas()   const;
+
+  protected slots:
+    void languageChange();
+    void sFillList();
+    void sAtlasSelected();
+  private:
 };
 
 #endif
+

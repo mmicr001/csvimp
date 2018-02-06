@@ -1,7 +1,7 @@
 /*
  * This file is part of the xTuple ERP: PostBooks Edition, a free and
  * open source Enterprise Resource Planning software suite,
- * Copyright (c) 1999-2016 by OpenMFG LLC, d/b/a xTuple.
+ * Copyright (c) 1999-2017 by OpenMFG LLC, d/b/a xTuple.
  * It is licensed to you under the Common Public Attribution License
  * version 1.0, the full text of which (including xTuple-specific Exhibits)
  * is available at www.xtuple.com/CPAL.  By using this software, you agree
@@ -12,12 +12,13 @@
 #define CSVTOOLWINDOW_H
 
 #include "ui_csvtoolwindow.h"
+#include "csvmap.h"
 
 class CSVAtlasWindow;
 class CSVData;
 class QTimerEvent;
 class LogWindow;
-class XAbstractMessageHandler;
+class YAbstractMessageHandler;
 
 class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
 {
@@ -28,8 +29,8 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     ~CSVToolWindow();
     CSVAtlasWindow *atlasWindow();
 
-    XAbstractMessageHandler *messageHandler() const;
-    void                     setMessageHandler(XAbstractMessageHandler *handler);
+    YAbstractMessageHandler *messageHandler() const;
+    void                     setMessageHandler(YAbstractMessageHandler *handler);
 
   public slots:
     void clearImportLog();
@@ -42,6 +43,10 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     void helpAbout();
     void helpContents();
     void helpIndex();
+    void insertAction(bool append = false);
+    void updateAction();
+    QVariant imageLoadAndEncode(QString fileName, bool enc = false);
+    QVariant docLoadAndEncode(QString fileName);
     bool importStart();
     void mapEdit();
     void sFirstRowHeader(bool yes);
@@ -60,8 +65,18 @@ class CSVToolWindow : public QMainWindow, public Ui::CSVToolWindow
     CSVData        *_data;
     int             _dbTimerId;
     LogWindow      *_log;
-    XAbstractMessageHandler *_msghandler;
+    YAbstractMessageHandler *_msghandler;
     void populate();
+
+  private:
+    QImage      __image;
+    int         _total;
+    int         _current;
+    int         _error;
+    int         _ignored;
+    QStringList _errorList;
+    QString     _errMsg;
+    CSVMap map;
 };
 
 #endif
