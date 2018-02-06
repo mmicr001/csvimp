@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
         QMessageBox::critical(0, QObject::tr("Can not load database driver"),
                               QObject::tr("<p>Unable to load the database "
                                           "driver. Please contact your systems "
-                                          "adminstrator."));
+                                          "administrator."));
         QApplication::exit(-1);
       }
 
