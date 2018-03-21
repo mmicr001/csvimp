@@ -1,5 +1,5 @@
 /* XPM */
-static char * CSVimpIcon[] = {
+const char * CSVimpIcon[] = {
 "32 32 517 2",
 "  	c None",
 ". 	c #BCBDC3",
