@@ -41,7 +41,7 @@ isEmpty( OPENRPT_LIBDIR ) {
 ! isEmpty( OPENRPT_LIBDIR_REL ) { OPENRPT_LIBDIR = ../$${OPENRPT_LIBDIR} }
 
 LIBEXT = $${QMAKE_EXTENSION_SHLIB}
-msvc:LIBEXT		 = lib
+msvc:LIBEXT	  = lib
 win32-g++:LIBEXT = a
 macx:LIBEXT      = a
 isEmpty( LIBEXT ) { LIBEXT = so }
