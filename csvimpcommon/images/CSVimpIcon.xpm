@@ -1,5 +1,5 @@
 /* XPM */
-static char *CSVimpIcon[] = {
+const char * CSVimpIcon[] = {
 /* columns rows colors chars-per-pixel */
 "32 32 146 2 ",
 "   c #FF3400",
@@ -182,3 +182,4 @@ static char *CSVimpIcon[] = {
 "m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.M N M l c N N M m.m.m.m.m.m.",
 "m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.m.M N N N m.m.m.m.m.m.m.m."
 };
+
