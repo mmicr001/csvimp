@@ -579,6 +579,7 @@ void CSVToolWindow::insertAction( bool append )
   QString  _fileName;
   QMimeDatabase mimedb;
   QString mimetype;
+  bool foundMimeType = false;
   CSVMapField::FileType filetype;
 
   query = QString("INSERT INTO %1 ").arg(map.table());
@@ -718,18 +719,6 @@ void CSVToolWindow::insertAction( bool append )
     front += fields.at(i).name();
     back  += label;
 
-    if (!mimetype.isEmpty())
-    {
-      if(!values.empty())
-      {
-        front += ", ";
-        back  += ", ";
-      }
-      values.insert(":file_mime_type", mimetype);
-      front += "file_mime_type";
-      back  += ":file_mime_type";
-    }
-
     if (append && fields.at(i).isKey())
     {
       if(!wheres.empty())
@@ -737,6 +726,16 @@ void CSVToolWindow::insertAction( bool append )
       wherenot += fields.at(i).name() + "=" + label;
       wheres.insert(label, var);
     }
+
+    if (fields.at(i).name() == "file_mime_type")
+      foundMimeType = true;
+  }
+
+  if (!foundMimeType && !mimetype.isEmpty())
+  {
+    values.insert(":file_mime_type", mimetype);
+    front += ", file_mime_type";
+    back  += ", :file_mime_type";
   }
 
   if(values.empty())
@@ -786,6 +785,7 @@ void CSVToolWindow::updateAction()
   QString  _fileName;
   QMimeDatabase mimedb;
   QString mimetype;
+  bool foundMimeType = false;
   CSVMapField::FileType filetype;
 
   query = QString("UPDATE %1 SET ").arg(map.table());
@@ -927,15 +927,16 @@ void CSVToolWindow::updateAction()
         set += ", ";
       set += fields.at(i).name() + "=" + label;
       values.insert(label, var);
-
-      if (!mimetype.isEmpty())
-      {
-        if(!values.empty())
-          set += ", ";
-        set += "file_mime_type=:file_mime_type";
-        values.insert(":file_mime_type", mimetype);
-      }
     }
+
+    if (fields.at(i).name() == "file_mime_type")
+      foundMimeType = true;
+  }
+
+  if (!foundMimeType && !mimetype.isEmpty())
+  {
+    set += ", file_mime_type=:file_mime_type";
+    values.insert(":file_mime_type", mimetype);
   }
 
   if(values.empty())
