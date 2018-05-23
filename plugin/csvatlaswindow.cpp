@@ -217,7 +217,8 @@ void CSVAtlasWindow::fileSave()
       return;
   }
 
-  if(_filename.indexOf("xml") < 1)
+  QFileInfo fi(_filename);
+  if(fi.suffix() != "xml")
     _filename = _filename + ".xml";
 
   if (tr("Update") == _action->currentText() || tr("Append") == _action->currentText())
