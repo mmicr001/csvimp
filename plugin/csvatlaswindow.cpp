@@ -217,6 +217,10 @@ void CSVAtlasWindow::fileSave()
       return;
   }
 
+  QFileInfo fi(_filename);
+  if(fi.suffix() != "xml")
+    _filename = _filename + ".xml";
+
   if (tr("Update") == _action->currentText() || tr("Append") == _action->currentText())
   {
     if (!hasKey())
@@ -249,7 +253,7 @@ void CSVAtlasWindow::fileSave()
 void CSVAtlasWindow::fileSaveAs()
 {
   QString filename = QFileDialog::getSaveFileName(this, tr("Save Atlas File"),
-                                                  _filename, QString::null);
+                                                  _filename, tr("Atlas Files (*.xml)"));
   if(filename.isEmpty())
     return;
 
