@@ -101,6 +101,8 @@ class CSVDataPrivate
                 maxcols = col;
               col = 0;
             }
+            else if(i==line.length()-1)
+              _model.append(record);
           }
           else if(('"' == c) && (_parent->delimiter() != '\t'))
           {
@@ -289,7 +291,7 @@ bool CSVData::load(QString filename, QWidget *parent)
     }
 
     QByteArray ba(buf);
-    if (! _data->parse(ba))
+    if (! _data->parse(ba)) //parse() always returns true
     {
       _msghandler->message(QtWarningMsg, tr("Parsing Error"),
                            tr("<p>Error parsing the data from %1 (delimiter %2).")
